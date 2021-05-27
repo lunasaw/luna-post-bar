@@ -44,6 +44,12 @@ public class User implements Serializable {
      */
     private Long version;
 
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
+    }
 
     public Long getId() {
         return id;

@@ -191,7 +191,7 @@
             modified_time = now(),
             version = version + 1,
         </set>
-        where id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=OTHER},
+        where id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=OTHER}
     </update>
 
     <!--通过表字段修改实体属性不为null的列-->
@@ -268,14 +268,9 @@
                     when id = #{item.id} then #{item.audioVoiPer}
                 </foreach>
             </trim>
-            <trim prefix="create_time = case" suffix="end,">
-                <foreach collection="list" item="item" index="index">
-                    when id = #{item.id} then #{item.createTime}
-                </foreach>
-            </trim>
             <trim prefix="modified_time = case" suffix="end,">
                 <foreach collection="list" item="item" index="index">
-                    when id = #{item.id} then #{item.modifiedTime}
+                    when id = #{item.id} then now()
                 </foreach>
             </trim>
             <trim prefix="version = case" suffix="end,">
@@ -299,9 +294,6 @@
     <delete id="deleteByEntity" parameterType="com.luna.post.entity.Audio">
         delete from tb_audio
         <where>
-            <if test="userId != null  ">
-                and user_id = #{userId,jdbcType=INTEGER}
-            </if>
             <if test="audioSpd != null  ">
                 and audio_spd = #{audioSpd,jdbcType=INTEGER}
             </if>
