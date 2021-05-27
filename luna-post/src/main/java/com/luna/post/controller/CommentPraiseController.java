@@ -1,5 +1,8 @@
 package com.luna.post.controller;
 
+import com.github.pagehelper.PageInfo;
+import com.luna.common.dto.ResultDTO;
+import com.luna.common.dto.constant.ResultCode;
 import com.luna.post.entity.CommentPraise;
 import com.luna.post.service.CommentPraiseService;
 import org.springframework.web.bind.annotation.*;
