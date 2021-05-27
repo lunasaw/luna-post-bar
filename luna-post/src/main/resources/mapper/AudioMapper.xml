@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luna.post.mapper.AudioMapper">
+
+    <resultMap type="com.luna.post.entity.Audio" id="AudioResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="audioSpd" column="audio_spd" jdbcType="INTEGER"/>
+        <result property="audioPit" column="audio_pit" jdbcType="INTEGER"/>
+        <result property="audioVol" column="audio_vol" jdbcType="INTEGER"/>
+        <result property="audioVoiPer" column="audio_voi_per" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="modifiedTime" column="modified_time" jdbcType="TIMESTAMP"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="table_field">
+      id, user_id, audio_spd, audio_pit, audio_vol, audio_voi_per, create_time, modified_time, version      
+    </sql>
+
+    <!--通过Id查询单个-->
+    <select id="getById" resultMap="AudioResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="table_field"/>
+        from tb_audio
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--通过实体不为空的属性作为筛选条件查询列表-->
+    <select id="listByEntity" resultMap="AudioResultMap" parameterType="com.luna.post.entity.Audio">
+        select
+        <include refid="table_field"/>
+        from tb_audio
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="audioSpd != null  ">
+                and audio_spd = #{audioSpd,jdbcType=INTEGER}
+            </if>
+            <if test="audioPit != null  ">
+                and audio_pit = #{audioPit,jdbcType=INTEGER}
+            </if>
+            <if test="audioVol != null  ">
+                and audio_vol = #{audioVol,jdbcType=INTEGER}
+            </if>
+            <if test="audioVoiPer != null  ">
+                and audio_voi_per = #{audioVoiPer,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体不为空的属性作为筛选条件查询单个-->
+    <select id="getByEntity" resultMap="AudioResultMap" parameterType="com.luna.post.entity.Audio">
+        select
+        <include refid="table_field"/>
+        from tb_audio
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="audioSpd != null  ">
+                and audio_spd = #{audioSpd,jdbcType=INTEGER}
+            </if>
+            <if test="audioPit != null  ">
+                and audio_pit = #{audioPit,jdbcType=INTEGER}
+            </if>
+            <if test="audioVol != null  ">
+                and audio_vol = #{audioVol,jdbcType=INTEGER}
+            </if>
+            <if test="audioVoiPer != null  ">
+                and audio_voi_per = #{audioVoiPer,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过Id列表作为筛选条件查询列表，列表长度不为0-->
+    <select id="listByIds" resultMap="AudioResultMap" parameterType="list">
+        select
+        <include refid="table_field"/>
+        from tb_audio
+        where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--新增实体属性不为null的列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.luna.post.entity.Audio">
+        insert into tb_audio
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">
+                user_id,
+            </if>
+            <if test="audioSpd != null  ">
+                audio_spd,
+            </if>
+            <if test="audioPit != null  ">
+                audio_pit,
+            </if>
+            <if test="audioVol != null  ">
+                audio_vol,
+            </if>
+            <if test="audioVoiPer != null  ">
+                audio_voi_per,
+            </if>
+            create_time,
+            modified_time,
+            version,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null  ">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="audioSpd != null  ">
+                #{audioSpd,jdbcType=INTEGER},
+            </if>
+            <if test="audioPit != null  ">
+                #{audioPit,jdbcType=INTEGER},
+            </if>
+            <if test="audioVol != null  ">
+                #{audioVol,jdbcType=INTEGER},
+            </if>
+            <if test="audioVoiPer != null  ">
+                #{audioVoiPer,jdbcType=INTEGER},
+            </if>
+            now(),
+            now(),
+            0,
+        </trim>
+    </insert>
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true" parameterType="list">
+        insert into tb_audio
+        (user_id, audio_spd, audio_pit, audio_vol, audio_voi_per, create_time, modified_time, version)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.userId,jdbcType=INTEGER}, #{item.audioSpd,jdbcType=INTEGER},
+            #{item.audioPit,jdbcType=INTEGER}, #{item.audioVol,jdbcType=INTEGER}, #{item.audioVoiPer,jdbcType=INTEGER},
+            now(),
+            now(),
+            0,)
+        </foreach>
+    </insert>
+
+    <!--通过主键修改实体属性不为null的列-->
+    <update id="update" parameterType="com.luna.post.entity.Audio">
+        update tb_audio
+        <set>
+            <if test="userId != null  ">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="audioSpd != null  ">
+                audio_spd = #{audioSpd,jdbcType=INTEGER},
+            </if>
+            <if test="audioPit != null  ">
+                audio_pit = #{audioPit,jdbcType=INTEGER},
+            </if>
+            <if test="audioVol != null  ">
+                audio_vol = #{audioVol,jdbcType=INTEGER},
+            </if>
+            <if test="audioVoiPer != null  ">
+                audio_voi_per = #{audioVoiPer,jdbcType=INTEGER},
+            </if>
+            modified_time = now(),
+            version = version + 1,
+        </set>
+        where id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=OTHER},
+    </update>
+
+    <!--通过表字段修改实体属性不为null的列-->
+    <update id="updateByField">
+        update tb_audio
+        <set>
+            <if test="where.userId == null and set.userId != null">
+                user_id = #{set.userId,jdbcType=INTEGER},
+            </if>
+            <if test="where.audioSpd == null and set.audioSpd != null">
+                audio_spd = #{set.audioSpd,jdbcType=INTEGER},
+            </if>
+            <if test="where.audioPit == null and set.audioPit != null">
+                audio_pit = #{set.audioPit,jdbcType=INTEGER},
+            </if>
+            <if test="where.audioVol == null and set.audioVol != null">
+                audio_vol = #{set.audioVol,jdbcType=INTEGER},
+            </if>
+            <if test="where.audioVoiPer == null and set.audioVoiPer != null">
+                audio_voi_per = #{set.audioVoiPer,jdbcType=INTEGER},
+            </if>
+            modified_time = now(),
+            version = version + 1,
+        </set>
+        <where>
+            <if test="where.id != null and id != ''">
+                and id = #{where.id,jdbcType=INTEGER}
+            </if>
+            <if test="where.userId != null and userId != ''">
+                and user_id = #{where.userId,jdbcType=INTEGER}
+            </if>
+            <if test="where.audioSpd != null and audioSpd != ''">
+                and audio_spd = #{where.audioSpd,jdbcType=INTEGER}
+            </if>
+            <if test="where.audioPit != null and audioPit != ''">
+                and audio_pit = #{where.audioPit,jdbcType=INTEGER}
+            </if>
+            <if test="where.audioVol != null and audioVol != ''">
+                and audio_vol = #{where.audioVol,jdbcType=INTEGER}
+            </if>
+            <if test="where.audioVoiPer != null and audioVoiPer != ''">
+                and audio_voi_per = #{where.audioVoiPer,jdbcType=INTEGER}
+            </if>
+            and version = #{where.version,jdbcType=OTHER} + 1
+        </where>
+    </update>
+
+    <!--通过主键修改实体列表，列表长度不能为0，注意：当实体属性为null时，对应的列也会别更新为null-->
+    <update id="updateBatch" parameterType="list">
+        update tb_audio
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="user_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.userId}
+                </foreach>
+            </trim>
+            <trim prefix="audio_spd = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.audioSpd}
+                </foreach>
+            </trim>
+            <trim prefix="audio_pit = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.audioPit}
+                </foreach>
+            </trim>
+            <trim prefix="audio_vol = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.audioVol}
+                </foreach>
+            </trim>
+            <trim prefix="audio_voi_per = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.audioVoiPer}
+                </foreach>
+            </trim>
+            <trim prefix="create_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.createTime}
+                </foreach>
+            </trim>
+            <trim prefix="modified_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.modifiedTime}
+                </foreach>
+            </trim>
+            <trim prefix="version = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} and version = #{item.version} then #{item.version} + 1
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from tb_audio where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--通过实体非空属性删除-->
+    <delete id="deleteByEntity" parameterType="com.luna.post.entity.Audio">
+        delete from tb_audio
+        <where>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="audioSpd != null  ">
+                and audio_spd = #{audioSpd,jdbcType=INTEGER}
+            </if>
+            <if test="audioPit != null  ">
+                and audio_pit = #{audioPit,jdbcType=INTEGER}
+            </if>
+            <if test="audioVol != null  ">
+                and audio_vol = #{audioVol,jdbcType=INTEGER}
+            </if>
+            <if test="audioVoiPer != null  ">
+                and audio_voi_per = #{audioVoiPer,jdbcType=INTEGER}
+            </if>
+            and id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=OTHER}
+        </where>
+    </delete>
+
+    <!--通过主键列表删除，列表长度不能为0-->
+    <delete id="deleteByIds" parameterType="list">
+        delete from tb_audio where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="countAll" resultType="int">
+        select count(id) from tb_audio
+    </select>
+
+    <select id="countByEntity" parameterType="com.luna.post.entity.Audio" resultType="int">
+        select count(id) from tb_audio
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="audioSpd != null  ">
+                and audio_spd = #{audioSpd,jdbcType=INTEGER}
+            </if>
+            <if test="audioPit != null  ">
+                and audio_pit = #{audioPit,jdbcType=INTEGER}
+            </if>
+            <if test="audioVol != null  ">
+                and audio_vol = #{audioVol,jdbcType=INTEGER}
+            </if>
+            <if test="audioVoiPer != null  ">
+                and audio_voi_per = #{audioVoiPer,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>

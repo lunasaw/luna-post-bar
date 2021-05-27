@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_HOME" value="logs"/>
+
+    <!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】 -->
+
+    <!-- ConsoleAppender：把日志输出到控制台 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %X{traceId} %p (%file:%line\) - %m%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="postLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/csi.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/csi.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %X{traceId} %p [%thread] (%file:%line\) - %m %X{uri}%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="com.luna.post" additivity="false" level="INFO">
+        <appender-ref ref="postLog"/>
+    </logger>
+
+    <!-- 控制台输出日志 -->
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luna.post.mapper.CommentPraiseMapper">
+
+    <resultMap type="com.luna.post.entity.CommentPraise" id="CommentPraiseResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="postId" column="post_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="modifiedTime" column="modified_time" jdbcType="TIMESTAMP"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="table_field">
+      id, post_id, user_id, comment_id, create_time, modified_time, version      
+    </sql>
+
+    <!--通过Id查询单个-->
+    <select id="getById" resultMap="CommentPraiseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="table_field"/>
+        from tb_comment_praise
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--通过实体不为空的属性作为筛选条件查询列表-->
+    <select id="listByEntity" resultMap="CommentPraiseResultMap" parameterType="com.luna.post.entity.CommentPraise">
+        select
+        <include refid="table_field"/>
+        from tb_comment_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="commentId != null  ">
+                and comment_id = #{commentId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体不为空的属性作为筛选条件查询单个-->
+    <select id="getByEntity" resultMap="CommentPraiseResultMap" parameterType="com.luna.post.entity.CommentPraise">
+        select
+        <include refid="table_field"/>
+        from tb_comment_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="commentId != null  ">
+                and comment_id = #{commentId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过Id列表作为筛选条件查询列表，列表长度不为0-->
+    <select id="listByIds" resultMap="CommentPraiseResultMap" parameterType="list">
+        select
+        <include refid="table_field"/>
+        from tb_comment_praise
+        where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--新增实体属性不为null的列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.luna.post.entity.CommentPraise">
+        insert into tb_comment_praise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  ">
+                id,
+            </if>
+            <if test="postId != null  ">
+                post_id,
+            </if>
+            <if test="userId != null  ">
+                user_id,
+            </if>
+            <if test="commentId != null  ">
+                comment_id,
+            </if>
+            <if test="createTime != null  ">
+                create_time,
+            </if>
+            <if test="modifiedTime != null  ">
+                modified_time,
+            </if>
+            <if test="version != null  ">
+                version,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  ">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="postId != null  ">
+                #{postId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null  ">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="commentId != null  ">
+                #{commentId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null  ">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifiedTime != null  ">
+                #{modifiedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null  ">
+                #{version,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true" parameterType="list">
+        insert into tb_comment_praise
+        (id, post_id, user_id, comment_id, create_time, modified_time, version)
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            (#{item.id,jdbcType=INTEGER}, #{item.postId,jdbcType=INTEGER}, #{item.userId,jdbcType=INTEGER},
+            #{item.commentId,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.modifiedTime,jdbcType=TIMESTAMP}, #{item.version,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改实体属性不为null的列-->
+    <update id="update" parameterType="com.luna.post.entity.CommentPraise">
+        update tb_comment_praise
+        <set>
+            <if test="postId != null  ">
+                post_id = #{postId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null  ">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="commentId != null  ">
+                comment_id = #{commentId,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null  ">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifiedTime != null  ">
+                modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null  ">
+                version = #{version,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--通过表字段修改实体属性不为null的列-->
+    <update id="updateByField">
+        update tb_comment_praise
+        <set>
+            <if test="where.postId == null and set.postId != null">
+                post_id = #{set.postId,jdbcType=INTEGER},
+            </if>
+            <if test="where.userId == null and set.userId != null">
+                user_id = #{set.userId,jdbcType=INTEGER},
+            </if>
+            <if test="where.commentId == null and set.commentId != null">
+                comment_id = #{set.commentId,jdbcType=INTEGER},
+            </if>
+            <if test="where.createTime == null and set.createTime != null">
+                create_time = #{set.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="where.modifiedTime == null and set.modifiedTime != null">
+                modified_time = #{set.modifiedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="where.version == null and set.version != null">
+                version = #{set.version,jdbcType=INTEGER},
+            </if>
+        </set>
+        <where>
+            <if test="where.id != null and id != ''">
+                and id = #{where.id,jdbcType=INTEGER}
+            </if>
+            <if test="where.postId != null and postId != ''">
+                and post_id = #{where.postId,jdbcType=INTEGER}
+            </if>
+            <if test="where.userId != null and userId != ''">
+                and user_id = #{where.userId,jdbcType=INTEGER}
+            </if>
+            <if test="where.commentId != null and commentId != ''">
+                and comment_id = #{where.commentId,jdbcType=INTEGER}
+            </if>
+            <if test="where.createTime != null and createTime != ''">
+                and create_time = #{where.createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="where.modifiedTime != null and modifiedTime != ''">
+                and modified_time = #{where.modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="where.version != null and version != ''">
+                and version = #{where.version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </update>
+
+    <!--通过主键修改实体列表，列表长度不能为0，注意：当实体属性为null时，对应的列也会别更新为null-->
+    <update id="updateBatch" parameterType="list">
+        update tb_comment_praise
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="post_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.postId}
+                </foreach>
+            </trim>
+            <trim prefix="user_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.userId}
+                </foreach>
+            </trim>
+            <trim prefix="comment_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.commentId}
+                </foreach>
+            </trim>
+            <trim prefix="create_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.createTime}
+                </foreach>
+            </trim>
+            <trim prefix="modified_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.modifiedTime}
+                </foreach>
+            </trim>
+            <trim prefix="version = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.version}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from tb_comment_praise where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--通过实体非空属性删除-->
+    <delete id="deleteByEntity" parameterType="com.luna.post.entity.CommentPraise">
+        delete from tb_comment_praise
+        <where>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="commentId != null  ">
+                and comment_id = #{commentId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </delete>
+
+    <!--通过主键列表删除，列表长度不能为0-->
+    <delete id="deleteByIds" parameterType="list">
+        delete from tb_comment_praise where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="countAll" resultType="int">
+        select count(id) from tb_comment_praise
+    </select>
+
+    <select id="countByEntity" parameterType="com.luna.post.entity.CommentPraise" resultType="int">
+        select count(id) from tb_comment_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="commentId != null  ">
+                and comment_id = #{commentId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>
