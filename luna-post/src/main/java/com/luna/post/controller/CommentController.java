@@ -1,5 +1,6 @@
 package com.luna.post.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
@@ -38,7 +39,14 @@ public class CommentController {
     @GetMapping("/list")
     public ResultDTO<List<CommentDTO>> list(Comment comment) {
         List<CommentDTO> commentList = commentService.listByEntity(comment);
+        System.out.println(JSON.toJSONString(commentList));
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentList);
+    }
+
+    @GetMapping("/getHot")
+    public ResultDTO<CommentDTO> getHot(Comment comment) {
+
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentService.getHot(comment));
     }
 
     @GetMapping("/pageListByEntity/{page}/{size}")

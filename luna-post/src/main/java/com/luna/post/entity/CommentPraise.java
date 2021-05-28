@@ -28,6 +28,12 @@ public class CommentPraise implements Serializable {
     /** 锁 */
     private Long              version;
 
+    public CommentPraise(Long postId) {
+        this.postId = postId;
+    }
+
+    public CommentPraise() {}
+
     public Long getId() {
         return id;
     }

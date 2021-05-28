@@ -1,18 +1,12 @@
 package com.luna.post.utils;
 
-import com.alibaba.fastjson.JSON;
 import com.luna.baidu.req.VoiceSynthesisReq;
 import com.luna.common.date.DateUtil;
-import com.luna.common.net.HttpUtils;
-import com.luna.common.os.SystemInfoUtil;
 import com.luna.post.dto.CommentDTO;
 import com.luna.post.dto.PostDTO;
 import com.luna.post.dto.ShowUserDTO;
 import com.luna.post.entity.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -78,8 +72,10 @@ public class DO2DTOUtil {
         return voiceSynthesisReq;
     }
 
-    public static CommentDTO comment2CommentDTO(Comment comment, String username, Date userTime, String photo) {
+    public static CommentDTO comment2CommentDTO(Comment comment, String username, Date userTime, String photo,
+        Integer praise) {
         CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setPostPraise(praise);
         commentDTO.setUsername(username);
         commentDTO.setUserTime(userTime != null
             ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, userTime) : "");

@@ -80,7 +80,7 @@ function getCommentList(postUUID, SynOrAsyn, url) {
                         '<audio src="' + list[i].audio + '" controls="controls" style="height:20px"></audio>' +
                         '&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
                         'onclick="hotsPraiseClick(\'' + list[i].postId + '\',\'' + list[i].id + '\')">' +
-                        '赞：</a>' + list[i].prise + '</div>';
+                        '赞：</a>' + list[i].postPraise + '</div>';
                 }
                 $('#comment_data').append(content);
             } else {

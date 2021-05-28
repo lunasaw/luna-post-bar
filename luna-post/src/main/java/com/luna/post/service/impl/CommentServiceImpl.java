@@ -1,17 +1,12 @@
 package com.luna.post.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.CommentDTO;
-import com.luna.post.entity.Register;
-import com.luna.post.entity.User;
-import com.luna.post.entity.UserException;
-import com.luna.post.mapper.CommentMapper;
-import com.luna.post.mapper.PostMapper;
-import com.luna.post.mapper.RegisterMapper;
-import com.luna.post.mapper.UserMapper;
+import com.luna.post.entity.*;
+import com.luna.post.mapper.*;
 import com.luna.post.service.CommentService;
-import com.luna.post.entity.Comment;
 
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.redis.util.RedisHashUtil;
@@ -22,7 +17,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -33,19 +30,22 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     @Resource
-    private CommentMapper  commentMapper;
+    private CommentMapper       commentMapper;
 
     @Resource
-    private PostMapper     postMapper;
+    private PostMapper          postMapper;
 
     @Resource
-    private RegisterMapper registerMapper;
+    private RegisterMapper      registerMapper;
 
     @Resource
-    private UserMapper     userMapper;
+    private UserMapper          userMapper;
 
     @Resource
-    private RedisHashUtil  redisHashUtil;
+    private CommentPraiseMapper commentPraiseMapper;
+
+    @Resource
+    private RedisHashUtil       redisHashUtil;
 
     @Override
     public Comment getById(Long id) {
@@ -62,12 +62,38 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> comments = commentMapper.listByEntity(comment);
         List<CommentDTO> collect = comments.stream().map(tempComment -> {
             // 这条评论的用户名
+            CommentPraise commentPraise = new CommentPraise();
+            commentPraise.setCommentId(tempComment.getId());
+            CommentPraise praise = commentPraiseMapper.getByEntity(commentPraise);
+            if (praise == null) {
+                commentPraise.setPraise(0);
+                commentPraise.setPostId(comment.getPostId());
+                commentPraiseMapper.insert(commentPraise);
+                praise = commentPraise;
+            }
             User user = userMapper.getById(Long.valueOf(tempComment.getUserId()));
             Register register = registerMapper.getByEntity(new Register(user.getId()));
             return DO2DTOUtil.comment2CommentDTO(tempComment, user.getName(), user.getCreateTime(),
-                register.getPhoto());
+                register.getPhoto(), praise.getPraise());
         }).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public CommentDTO getHot(Comment comment) {
+        List<CommentPraise> commentPraises = commentPraiseMapper.listByEntity(new CommentPraise(comment.getPostId()));
+        Optional<CommentPraise> first =
+            commentPraises.stream().sorted(Comparator.comparing(CommentPraise::getPraise).reversed()).findFirst();
+        if (first.isPresent()) {
+            CommentPraise commentPraise = first.get();
+            // 这条评论的用户名
+            User user = userMapper.getById(Long.valueOf(commentPraise.getUserId()));
+            Register register = registerMapper.getByEntity(new Register(user.getId()));
+            Comment tempComment = commentMapper.getById(commentPraise.getCommentId());
+            return DO2DTOUtil.comment2CommentDTO(tempComment, user.getName(), user.getCreateTime(),
+                register.getPhoto(), commentPraise.getPraise());
+        }
+        return null;
     }
 
     @Override

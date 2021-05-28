@@ -4,6 +4,8 @@ import com.luna.post.mapper.CommentPraiseMapper;
 import com.luna.post.service.CommentPraiseService;
 import com.luna.post.entity.CommentPraise;
 import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -56,9 +58,6 @@ public class CommentPraiseServiceImpl implements CommentPraiseService {
 
     @Override
     public int insert(CommentPraise commentPraise) {
-        Date date = new Date();
-        commentPraise.setCreateTime(date);
-        commentPraise.setUpdateTime(date);
         return commentPraiseMapper.insert(commentPraise);
     }
 
@@ -69,7 +68,6 @@ public class CommentPraiseServiceImpl implements CommentPraiseService {
 
     @Override
     public int update(CommentPraise commentPraise) {
-        commentPraise.setUpdateTime(new Date());
         return commentPraiseMapper.update(commentPraise);
     }
 

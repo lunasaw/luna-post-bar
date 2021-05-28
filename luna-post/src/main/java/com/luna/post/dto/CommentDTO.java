@@ -1,7 +1,6 @@
 package com.luna.post.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 评论
@@ -56,10 +55,23 @@ public class CommentDTO implements Serializable {
      * 修改时间
      */
     private String            modifiedTime;
+
+    /**
+     * 赞个数
+     */
+    private Integer           postPraise;
     /**
      * 锁
      */
     private Long              version;
+
+    public Integer getPostPraise() {
+        return postPraise;
+    }
+
+    public void setPostPraise(Integer postPraise) {
+        this.postPraise = postPraise;
+    }
 
     public String getUsername() {
         return username;

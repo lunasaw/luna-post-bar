@@ -37,10 +37,17 @@ public interface CommentService {
     List<CommentDTO> listByEntity(Comment comment);
 
     /**
+     * 获取热点评论
+     *
+     * @return
+     */
+    CommentDTO getHot(Comment comment);
+
+    /**
      * 条件分页查询
      *
-     * @param comment  查询条件
-     * @param page     起始标号
+     * @param comment 查询条件
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
@@ -49,7 +56,7 @@ public interface CommentService {
     /**
      * 条件分页查询
      *
-     * @param page     起始标号
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
@@ -135,4 +142,5 @@ public interface CommentService {
      * @return 影响行数
      */
     int countByEntity(Comment comment);
+
 }
