@@ -45,6 +45,11 @@ public class Comment implements Serializable {
      */
     private Long version;
 
+    public Comment(Long postId) {
+        this.postId = postId;
+    }
+
+    public Comment() {}
 
     public Long getId() {
         return id;

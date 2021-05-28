@@ -1,8 +1,7 @@
 package com.luna.post.service;
 
-import com.luna.post.mapper.PostMapper;
+import com.luna.post.dto.PostDTO;
 import com.luna.post.entity.Post;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -40,17 +39,17 @@ public interface PostService {
     /**
      * 条件分页查询
      *
-     * @param post     查询条件
-     * @param page     起始标号
+     * @param post 查询条件
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
-    PageInfo<Post> listPageByEntity(int page, int pageSize, Post post);
+    PageInfo<PostDTO> listPageByEntity(int page, int pageSize, Post post);
 
     /**
      * 条件分页查询
      *
-     * @param page     起始标号
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
@@ -67,10 +66,12 @@ public interface PostService {
     /**
      * 插入
      *
+     *
+     * @param oneSessionKey
      * @param post 对象
      * @return 影响行数
      */
-    int insert(Post post);
+    int insert(String oneSessionKey, Post post);
 
     /**
      * 列表插入
@@ -134,4 +135,15 @@ public interface PostService {
      * @return 影响行数
      */
     int countByEntity(Post post);
+
+    /**
+     * 查询本人发布的文章
+     * 
+     * @param oneSessionKey
+     * @param page
+     * @param size
+     * @param post
+     * @return
+     */
+    PageInfo<PostDTO> MyListPageByEntity(String oneSessionKey, int page, int size, Post post);
 }

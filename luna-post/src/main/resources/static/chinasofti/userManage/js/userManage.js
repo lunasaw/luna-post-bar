@@ -4,7 +4,7 @@ var postAllPage = 0;
 $(document).ready(function () {
 
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, 1, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, 1, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
     var regage = $("#regAge");
     var selectPotion = $("#regAge option");
@@ -17,7 +17,7 @@ $(document).ready(function () {
 
 });
 
-function getPostList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
+function getUserList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
     let userInfo = {
         name: postTitle
     }
@@ -111,12 +111,12 @@ function GOTO_POST_NEXT_PAGE() {
 
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     postPageIndex = postPageIndex + 1;
-    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function GOTO_POST_TAIL_PAGE() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, postAllPage, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, postAllPage, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function GOTO_POST_PAGE() {
@@ -138,25 +138,25 @@ function GOTO_POST_PAGE() {
         return;
     }
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, jumpVal, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, jumpVal, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 
 function GOTO_POST_HOME_PAGE() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function GOTO_POST_PREVIOUS_PAGE() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     postPageIndex = postPageIndex - 1;
-    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
 }
 
 function searchByPostName() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
+    getUserList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function DELETE_POST() {
@@ -195,7 +195,7 @@ function deleteUser(ids) {
 
             $.MsgBox.Alert("消息", "删除成功");
             let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-            getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
+            getUserList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
         }
     });
     // window.location = "${ctx }/user/removeUser?ids=" + ids.get();
@@ -288,7 +288,7 @@ function update(userInfo){
                 $("#POST_LIST_DIV_ID").attr("style", "display:block;");//隐藏div
                 $("#POST_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
                 var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-                getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
+                getUserList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
             } else {
                 $.MsgBox.Alert("消息", "修改失败");

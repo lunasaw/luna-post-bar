@@ -18,6 +18,10 @@ public class PostDTO implements Serializable {
      */
     private Long              userId;
     /**
+     * 创建人
+     */
+    private String            username;
+    /**
      * 文章标题
      */
     private String            postTitle;
@@ -46,6 +50,10 @@ public class PostDTO implements Serializable {
      * 修改时间
      */
     private String            modifiedTime;
+    /**
+     * 最后评论时间
+     */
+    private String            lastComment;
     /**
      * 锁
      */
@@ -131,4 +139,19 @@ public class PostDTO implements Serializable {
         this.version = version;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getLastComment() {
+        return lastComment;
+    }
+
+    public void setLastComment(String lastComment) {
+        this.lastComment = lastComment;
+    }
 }
