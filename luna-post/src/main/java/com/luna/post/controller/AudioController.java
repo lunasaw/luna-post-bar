@@ -1,14 +1,19 @@
 package com.luna.post.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.post.dto.AudioDTO;
 import com.luna.post.entity.Audio;
 import com.luna.post.service.AudioService;
+import com.luna.post.utils.CookieUtils;
 import org.springframework.http.HttpMethod;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -29,8 +34,9 @@ public class AudioController {
     }
 
     @GetMapping("/get")
-    public ResultDTO<Audio> getByEntity(Audio audio) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audioService.getByEntity(audio));
+    public ResultDTO<Audio> getByEntity(HttpServletRequest httpServletRequest, Audio audio) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            audioService.getByEntity(CookieUtils.getOneSessionKey(httpServletRequest), audio));
     }
 
     @GetMapping("/list")
@@ -40,21 +46,24 @@ public class AudioController {
     }
 
     @GetMapping("/pageListByEntity/{page}/{size}")
-    public ResultDTO<PageInfo<Audio>> listPageByEntity(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size, Audio audio) {
+    public ResultDTO<PageInfo<Audio>> listPageByEntity(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size, Audio audio) {
         PageInfo<Audio> pageInfo = audioService.listPageByEntity(page, size, audio);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
     @GetMapping("/pageList/{page}/{size}")
-    public ResultDTO<PageInfo<Audio>> listPage(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size) {
+    public ResultDTO<PageInfo<Audio>> listPage(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size) {
         PageInfo<Audio> pageInfo = audioService.listPage(page, size);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
     @PostMapping("/insert")
-    public ResultDTO<Audio> insert(@RequestBody Audio audio) {
-        audioService.insert(audio);
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audio);
+    public ResultDTO<AudioDTO> insert(HttpServletRequest httpServletRequest,
+        @Validated @RequestBody AudioDTO audioDTO) {
+        audioService.insert(CookieUtils.getOneSessionKey(httpServletRequest), audioDTO);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audioDTO);
     }
 
     @PostMapping("/insertBatch")
@@ -64,13 +73,15 @@ public class AudioController {
     }
 
     @PutMapping("/update")
-    public ResultDTO<Boolean> update(@RequestBody Audio audio) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audioService.update(audio) == 1);
+    public ResultDTO<Boolean> update(HttpServletRequest httpServletRequest, @Validated @RequestBody AudioDTO audioDTO) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            audioService.update(CookieUtils.getOneSessionKey(httpServletRequest), audioDTO) == 1);
     }
 
     @PutMapping("/updateBatch")
     public ResultDTO<Boolean> update(@RequestBody List<Audio> list) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audioService.updateBatch(list) == list.size());
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            audioService.updateBatch(list) == list.size());
     }
 
     @DeleteMapping("/delete/{id}")
@@ -80,7 +91,8 @@ public class AudioController {
 
     @DeleteMapping("/deleteByEntity")
     public ResultDTO<Boolean> deleteOne(@RequestBody Audio audio) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, audioService.deleteByEntity(audio) == 1);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            audioService.deleteByEntity(audio) == 1);
     }
 
     @DeleteMapping("/delete")
@@ -100,6 +112,6 @@ public class AudioController {
     @GetMapping("/accountByEntity")
     public ResultDTO<Integer> getAccountByEntity(Audio audio) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
-                audioService.countByEntity(audio));
+            audioService.countByEntity(audio));
     }
 }

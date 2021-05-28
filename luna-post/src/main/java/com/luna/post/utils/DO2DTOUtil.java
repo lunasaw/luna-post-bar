@@ -33,4 +33,8 @@ public class DO2DTOUtil {
         showUserDTO.setPhoto(register.getPhoto());
         return showUserDTO;
     }
+
+    public static void method() {
+
+    }
 }

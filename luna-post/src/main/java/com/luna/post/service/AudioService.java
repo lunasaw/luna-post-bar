@@ -1,8 +1,7 @@
 package com.luna.post.service;
 
-import com.luna.post.mapper.AudioMapper;
+import com.luna.post.dto.AudioDTO;
 import com.luna.post.entity.Audio;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -24,10 +23,12 @@ public interface AudioService {
     /**
      * 通过实体不为空的属性作为筛选条件查询单个
      *
+     *
+     * @param oneSessionKey
      * @param audio 条件
      * @return 对象
      */
-    Audio getByEntity(Audio audio);
+    Audio getByEntity(String oneSessionKey, Audio audio);
 
     /**
      * 通过实体不为空的属性作为筛选条件查询列表
@@ -40,8 +41,8 @@ public interface AudioService {
     /**
      * 条件分页查询
      *
-     * @param audio    查询条件
-     * @param page     起始标号
+     * @param audio 查询条件
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
@@ -50,7 +51,7 @@ public interface AudioService {
     /**
      * 条件分页查询
      *
-     * @param page     起始标号
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */
@@ -67,10 +68,12 @@ public interface AudioService {
     /**
      * 插入
      *
-     * @param audio 对象
+     *
+     * @param oneSessionKey
+     * @param audioDTO 对象
      * @return 影响行数
      */
-    int insert(Audio audio);
+    int insert(String oneSessionKey, AudioDTO audioDTO);
 
     /**
      * 列表插入
@@ -83,10 +86,10 @@ public interface AudioService {
     /**
      * 更新
      *
-     * @param audio 对象
+     * @param audioDTO
      * @return 影响行数
      */
-    int update(Audio audio);
+    int update(String sessionKey, AudioDTO audioDTO);
 
     /**
      * 列表更新

@@ -1,17 +1,24 @@
 package com.luna.post.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.post.config.LoginInterceptor;
+import com.luna.post.dto.AudioDTO;
+import com.luna.post.entity.User;
+import com.luna.post.entity.UserException;
 import com.luna.post.mapper.AudioMapper;
+import com.luna.post.mapper.UserMapper;
 import com.luna.post.service.AudioService;
 import com.luna.post.entity.Audio;
 
-import javax.annotation.Resource;
-
+import com.luna.redis.util.RedisHashUtil;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
-import java.util.Date;
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -22,7 +29,13 @@ import java.util.List;
 public class AudioServiceImpl implements AudioService {
 
     @Autowired
-    private AudioMapper audioMapper;
+    private AudioMapper   audioMapper;
+
+    @Resource
+    private UserMapper    userMapper;
+
+    @Autowired
+    private RedisHashUtil redisHashUtil;
 
     @Override
     public Audio getById(Long id) {
@@ -30,7 +43,16 @@ public class AudioServiceImpl implements AudioService {
     }
 
     @Override
-    public Audio getByEntity(Audio audio) {
+    public Audio getByEntity(String sessionKey, Audio audio) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+
+        if (audio == null) {
+            audio = new Audio(user.getId());
+        }
         return audioMapper.getByEntity(audio);
     }
 
@@ -59,7 +81,18 @@ public class AudioServiceImpl implements AudioService {
     }
 
     @Override
-    public int insert(Audio audio) {
+    public int insert(String sessionKey, AudioDTO audioDTO) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        Audio audio = new Audio();
+        audio.setUserId(user.getId());
+        audio.setAudioSpd(audioDTO.getAudioSpd());
+        audio.setAudioPit(audioDTO.getAudioPit());
+        audio.setAudioVol(audioDTO.getAudioVol());
+        audio.setAudioVoiPer(audioDTO.getAudioVoiPer());
         return audioMapper.insert(audio);
     }
 
@@ -69,8 +102,23 @@ public class AudioServiceImpl implements AudioService {
     }
 
     @Override
-    public int update(Audio audio) {
-        return audioMapper.update(audio);
+    public int update(String sessionKey, AudioDTO audioDTO) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        Audio byEntity = audioMapper.getByEntity(new Audio(user.getId()));
+
+        if (byEntity == null) {
+            return insert(sessionKey, audioDTO);
+        } else {
+            byEntity.setAudioSpd(audioDTO.getAudioSpd());
+            byEntity.setAudioPit(audioDTO.getAudioPit());
+            byEntity.setAudioVol(audioDTO.getAudioVol());
+            byEntity.setAudioVoiPer(audioDTO.getAudioVoiPer());
+        }
+        return audioMapper.update(byEntity);
     }
 
     @Override
@@ -104,4 +152,3 @@ public class AudioServiceImpl implements AudioService {
     }
 
 }
-
