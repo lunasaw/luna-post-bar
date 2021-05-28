@@ -1,7 +1,9 @@
 var file = "";
 $(document).ready(function () {
 
-    $("#finalImg").attr('src', "headPhoto/default/default.jpg");
+
+    sysUser();
+
 
 });
 //弹出框水平垂直居中
@@ -113,7 +115,67 @@ function subphoto() {
         $.MsgBox.Alert("消息", "剪裁区域的图片过大，上传头像大小不能超过2M！现在大小约为：" + Math.floor((file.length / 1000000)) + "M");
         return;
     }
+    uploadFile();
+}
 
-    $.MsgBox.Alert("消息", "上传成功");
+function sysUser() {
+    $.ajax({
+        type: "GET",
+        url: "/post/user/api/sysUserInfo",
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+            }
+            $("#finalImg").attr('src', data.photo);
+        }
+    });
+}
 
+
+function uploadFile() {
+    let formData = new FormData();
+    let file = $('#chooseImg')[0].files[0];
+    formData.append('file', file);
+    $.ajax(
+        {
+            url: '/post/user/api/upload',
+            type: 'POST',
+            data: formData,
+            contentType: false, //禁止设置请求类型
+            processData: false, //禁止jquery对data数据的处理,默认会处理，禁止的原因是,FormData已经帮我们做了处理
+            dataType: "json",
+            error: function (XMLHttpRequest, textStatus, text) {
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+            },
+            success: function (result) {
+                console.log(result);
+                let data;
+                try {
+                    data = checkResultAndGetData(result);
+                } catch (error) {
+                    console.log(error)
+                    // alert(JSON.stringify(error));
+                    $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                    return;
+                }
+                if (data) {
+                    $.MsgBox.Alert("消息", "上传成功");
+                } else {
+                    $.MsgBox.Alert("消息", "上传失败，请重试");
+                }
+            }
+        }
+    );
+}
+
+function checkResultAndGetData($result) {
+    if ($result.success == false) {
+        throw $result;
+    }
+    return $result.data;
 }

@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="static/comp/fontawesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="static/comp/ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="static/comp/adminlte/css/adminlte.css">
-	<link rel="stylesheet" href="static/css/default/mask.css" />
+	<link rel="stylesheet" href="static/css/default/mask.css"/>
 	<link rel="stylesheet" href="chinasofti/uploadHead/css/cropper.min.css">
 	<link rel="stylesheet" href="chinasofti/uploadHead/css/ImgCropping.css">
 </head>
@@ -23,7 +23,7 @@
 		<div class="card-header">
 			<h3 class="card-title">上传头像</h3>
 		</div>
-		<input id="regUUID" type="hidden" value="" />
+		<input id="regUUID" type="hidden" value=""/>
 		<div class="form-horizontal">
 			<div class="card-body" style="text-align: center;">
 				<!-- ------------ -->
@@ -41,8 +41,9 @@
 					<div class="tailoring-content">
 						<div class="tailoring-content-one">
 							<label title="上传图片" for="chooseImg" class="l-btn choose-btn">
-								<input type="file" accept="image/jpg,image/jpeg,image/png" name="file" id="chooseImg"
-									class="hidden" onchange="selectImg(this)">
+								<input type="file" accept="image/jpg,image/jpeg,image/png" name="file"
+								       id="chooseImg"
+								       class="hidden" onchange="selectImg(this)">
 								选择图片
 							</label>
 							<div class="close-tailoring" onclick="closeTailor(this)">×</div>
@@ -70,9 +71,6 @@
 
 		</div>
 	</div>
-
-
-
 
 
 	<script src="static/comp/jquery/dist/jquery.js"></script>

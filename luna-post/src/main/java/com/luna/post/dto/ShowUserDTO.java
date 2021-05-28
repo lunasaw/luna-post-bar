@@ -1,5 +1,7 @@
 package com.luna.post.dto;
 
+import javax.validation.constraints.*;
+
 /**
  * @author luna
  * 2021/5/28
@@ -13,6 +15,7 @@ public class ShowUserDTO {
     /**
      * 用户名
      */
+    @NotBlank
     private String  name;
     /**
      * 密码
@@ -37,16 +40,17 @@ public class ShowUserDTO {
     /**
      * 年龄
      */
+    @Min(value = 0, message = "年龄不能小于0")
     private Integer age;
     /**
      * 邮箱
      */
+    @Email
     private String  email;
     /**
      * 头像
      */
     private String  photo;
-
 
     public Long getId() {
         return id;

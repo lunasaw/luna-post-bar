@@ -56,6 +56,8 @@ public class LoginService {
         }
 
         String s = HashTools.md5(HashTools.md5(password));
+        System.out.println(s);
+        System.out.println(user.getPassword());
         if (!StringUtils.equals(user.getPassword(), s)) {
             throw new UserException(ResultCode.PARAMETER_INVALID, "密码错误");
         }
