@@ -1,5 +1,9 @@
 package com.luna.post.service.impl;
+import java.util.Date;
 
+import com.luna.common.encrypt.HashTools;
+import com.luna.post.entity.Register;
+import com.luna.post.mapper.RegisterMapper;
 import com.luna.post.mapper.UserMapper;
 import com.luna.post.service.UserService;
 import com.luna.post.entity.User;
@@ -19,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RegisterMapper registerMapper;
 
     @Override
     public User getById(Long id) {

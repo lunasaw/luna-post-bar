@@ -3,7 +3,7 @@ var postPageIndex = 1;
 var postAllPage = 0;
 $(document).ready(function () {
 
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     getPostList(searchNameVal, 1, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
     var regage = $("#regAge");
@@ -109,13 +109,13 @@ function showPostlist(registerList, postAllNum, allPage, pageIndex) {
 
 function GOTO_POST_NEXT_PAGE() {
 
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     postPageIndex = postPageIndex + 1;
     getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function GOTO_POST_TAIL_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     getPostList(searchNameVal, postAllPage, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
@@ -137,20 +137,19 @@ function GOTO_POST_PAGE() {
         $.MsgBox.Alert("消息", "页码超出上限");
         return;
     }
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     getPostList(searchNameVal, jumpVal, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 
 function GOTO_POST_HOME_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 }
 
 function GOTO_POST_PREVIOUS_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
     postPageIndex = postPageIndex - 1;
-
     getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
 }
@@ -175,7 +174,6 @@ function DELETE_POST() {
 }
 
 function deleteUser(ids) {
-    console.log(JSON.stringify(ids))
     // 发送请求
     $.ajax({
         url: "/post/user/api/delete", // url where to submit the request
@@ -196,7 +194,7 @@ function deleteUser(ids) {
             console.log(data);
 
             $.MsgBox.Alert("消息", "删除成功");
-            let searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
+            let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
             getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/user/api/showUserPageList");
         }
     });
@@ -212,6 +210,20 @@ function editUserCheck() {
     var admin = $("#admin").val();
     var password = $("#password").val();
     var oldName = $("#oldUserName").val();
+
+    let userInfo = {
+        id : userUUID,
+        name: userName,
+        sex: regsex,
+        age: regAge,
+        admin: admin,
+        email: regEmial,
+        password: password
+    }
+
+    console.log(JSON.stringify(userInfo))
+
+
     if (typeof (userName) == 'undefined' || userName.trim() == "") {
         $("#tishi").html("用户名不能为空");
         return;
@@ -237,23 +249,52 @@ function editUserCheck() {
         return false;
     }
 
+    update(userInfo);
+}
 
-    $.MsgBox.Alert("消息", "修改成功");
-    $("#userUUID").val("");
-    $("#userName").val("");
-    $("#regsex").val("");
-    $("#regAge").val("");
-    $("#regEmial").val("");
-    $("#admin").val("");
-    $("#password").val("");
-    $("#oldUserName").val("");
-    $("#tishi").html("");
-    $("#POST_LIST_DIV_ID").attr("style", "display:block;");//隐藏div
-    $("#POST_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
+function update(userInfo){
+    $.ajax({
+        type: "PUT",
+        url: "/post/user/api/userManage/update",
+        async: true,
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(userInfo),
+        dataType: "json",
+        error: function (XMLHttpRequest, textStatus, text) {
+            $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+        },
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(error));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+            if (data) {
+                $.MsgBox.Alert("消息", "修改成功");
+                $("#userUUID").val("");
+                $("#userName").val("");
+                $("#regsex").val("");
+                $("#regAge").val("");
+                $("#regEmial").val("");
+                $("#admin").val("");
+                $("#password").val("");
+                $("#oldUserName").val("");
+                $("#tishi").html("");
+                $("#POST_LIST_DIV_ID").attr("style", "display:block;");//隐藏div
+                $("#POST_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
+                var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+                getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
-
+            } else {
+                $.MsgBox.Alert("消息", "修改失败");
+            }
+        }
+    });
 }
 
 function returnPostList() {

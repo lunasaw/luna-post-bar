@@ -8,10 +8,7 @@ import com.luna.post.entity.User;
 import com.luna.post.service.UserService;
 import com.luna.post.user.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author luna
@@ -29,6 +26,11 @@ public class UserManageRest {
                                                              @PathVariable(value = "size") int size, User user) {
         PageInfo<ShowUserDTO> pageInfo = userManager.listPageByEntity(page, size, user);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
+    }
+
+    @PutMapping("/userManage/update")
+    public ResultDTO<Boolean> update(@RequestBody ShowUserDTO showUserDTO) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, userManager.update(showUserDTO) == 1);
     }
 
 }
