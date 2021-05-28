@@ -48,6 +48,12 @@ public class Register implements Serializable {
      */
     private Long version;
 
+    public Register() {
+    }
+
+    public Register(Long userId) {
+        this.userId = userId;
+    }
 
     public Long getId() {
         return id;

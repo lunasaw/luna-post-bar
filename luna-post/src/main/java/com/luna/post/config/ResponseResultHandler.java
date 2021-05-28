@@ -17,6 +17,7 @@ public class ResponseResultHandler {
 
     @ExceptionHandler(value = Exception.class)
     ResultDTO<Void> handleException(Exception e, HttpServletRequest request) {
+        e.printStackTrace();
         return ResultDTOUtils.failure(ResultCode.ERROR_SYSTEM_EXCEPTION, e.getMessage());
     }
 }

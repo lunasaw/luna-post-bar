@@ -642,10 +642,11 @@ function sysUser() {
                 data = checkResultAndGetData(result);
             } catch (error) {
             }
-            $("#userNameSpan").html( data.name);
+            $("#userNameSpan").html(data.name);
         }
     });
 }
+
 function checkResultAndGetData($result) {
     if ($result.success == false) {
         throw $result;
