@@ -12,7 +12,6 @@ function GetQueryString(name) {
 }
 
 $(function () {
-
     KindEditor.options.cssData = 'body {font-family:微软雅黑;}',
         editor = KindEditor.create('textarea[id="COM_ADD_DES"]', {
             allowUpload: true,
@@ -30,9 +29,73 @@ $(function () {
 
     postUUID = GetQueryString("postid");
     returnpage = GetQueryString("page");
-    getPostList(postUUID, true, "/postbar/commentController/getInit");
+
+    getCommentList(postUUID, true, "/post/comment/api/list");
 });
 
+function getCommentList(postUUID, SynOrAsyn, url) {
+    let comment = {
+        postId: postUUID
+    }
+    console.log(comment)
+    $.ajax({
+        url: url, // url where to submit the request
+        type: "GET", // type of action POST || GET
+        data: comment,
+        sync: SynOrAsyn,
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(error));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+
+            console.log(data);
+            if (data == null) {
+                return;
+            }
+            // 渲染页面
+            let list = data;
+            if (list.length > 0) {
+                let content = '';
+                $('#comment_data').empty();
+                for (let i in list) {
+
+                    content = content + '<div class="form-inline col-sm-12">' +
+                        '<div><img src="' + list[i].photo + '" style="whith:80px;height:80px"></div>' +
+                        '<div>' +
+                        '<table>' +
+                        '<tbody>' +
+                        '<tr><td>评论人：' + list[i].username + '</td></tr>' +
+                        '<tr><td>评论人注册时间:' + list[i].userTime + '</td></tr>' +
+                        '<tr><td>评论时间：' + list[i].createTime + '</td></tr>' +
+                        '<tr><td>删除选中：<input name="DELETE_CHECK_NAME" type="checkbox" value="c9c8ee13e83149379d56d34ea7913d69"></td></tr>' +
+                        '</tbody></table></div></div><div class="col-sm-12">' +
+                        '<span>' + list[i].content + '</span></div><div class="col-sm-12">' +
+                        '<audio src="' + list[i].audio + '" controls="controls" style="height:20px"></audio>' +
+                        '&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
+                        'onclick="hotsPraiseClick(\'' + list[i].postId + '\',\'' + list[i].id + '\')">' +
+                        '赞：</a>' + list[i].prise + '</div>';
+                }
+                $('#comment_data').append(content);
+            } else {
+                $('#comment_data').empty();
+            }
+        }
+    });
+}
+
+function checkResultAndGetData($result) {
+    if ($result.success == false) {
+        throw $result;
+    }
+    return $result.data;
+}
 
 function getPostList(postUUID, SynOrAsyn, url) {
 

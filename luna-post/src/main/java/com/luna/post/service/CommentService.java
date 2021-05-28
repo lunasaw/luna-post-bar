@@ -1,8 +1,7 @@
 package com.luna.post.service;
 
-import com.luna.post.mapper.CommentMapper;
+import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.Comment;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public interface CommentService {
      * @param comment 条件
      * @return 对象列表
      */
-    List<Comment> listByEntity(Comment comment);
+    List<CommentDTO> listByEntity(Comment comment);
 
     /**
      * 条件分页查询
@@ -67,10 +66,12 @@ public interface CommentService {
     /**
      * 插入
      *
+     *
+     * @param oneSessionKey
      * @param comment 对象
      * @return 影响行数
      */
-    int insert(Comment comment);
+    int insert(String oneSessionKey, Comment comment);
 
     /**
      * 列表插入

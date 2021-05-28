@@ -3,11 +3,14 @@ package com.luna.post.controller;
 import com.github.pagehelper.PageInfo;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.Comment;
 import com.luna.post.service.CommentService;
+import com.luna.post.utils.CookieUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -33,26 +36,28 @@ public class CommentController {
     }
 
     @GetMapping("/list")
-    public ResultDTO<List<Comment>> list(Comment comment) {
-        List<Comment> commentList = commentService.listByEntity(comment);
+    public ResultDTO<List<CommentDTO>> list(Comment comment) {
+        List<CommentDTO> commentList = commentService.listByEntity(comment);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentList);
     }
 
     @GetMapping("/pageListByEntity/{page}/{size}")
-    public ResultDTO<PageInfo<Comment>> listPageByEntity(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size, Comment comment) {
+    public ResultDTO<PageInfo<Comment>> listPageByEntity(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size, Comment comment) {
         PageInfo<Comment> pageInfo = commentService.listPageByEntity(page, size, comment);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
     @GetMapping("/pageList/{page}/{size}")
-    public ResultDTO<PageInfo<Comment>> listPage(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size) {
+    public ResultDTO<PageInfo<Comment>> listPage(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size) {
         PageInfo<Comment> pageInfo = commentService.listPage(page, size);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
     @PostMapping("/insert")
-    public ResultDTO<Comment> insert(@RequestBody Comment comment) {
-        commentService.insert(comment);
+    public ResultDTO<Comment> insert(HttpServletRequest httpServletRequest, @RequestBody Comment comment) {
+        commentService.insert(CookieUtils.getOneSessionKey(httpServletRequest), comment);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, comment);
     }
 
@@ -69,7 +74,8 @@ public class CommentController {
 
     @PutMapping("/updateBatch")
     public ResultDTO<Boolean> update(@RequestBody List<Comment> list) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentService.updateBatch(list) == list.size());
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentService.updateBatch(list) == list.size());
     }
 
     @DeleteMapping("/delete/{id}")
@@ -79,7 +85,8 @@ public class CommentController {
 
     @DeleteMapping("/deleteByEntity")
     public ResultDTO<Boolean> deleteOne(@RequestBody Comment comment) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentService.deleteByEntity(comment) == 1);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentService.deleteByEntity(comment) == 1);
     }
 
     @DeleteMapping("/delete")
@@ -99,6 +106,6 @@ public class CommentController {
     @GetMapping("/accountByEntity")
     public ResultDTO<Integer> getAccountByEntity(Comment comment) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
-                commentService.countByEntity(comment));
+            commentService.countByEntity(comment));
     }
 }

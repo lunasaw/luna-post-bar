@@ -18,8 +18,8 @@ $(document).ready(function () {
         });
 
 
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 
 });
 
@@ -58,10 +58,124 @@ function addPostCheck() {
         return;
     }
 
-
+    let tempPost = {
+        postTitle: title,
+        postText: text
+    }
+    insertPost(tempPost);
     returnPostList();
+    let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 
 
+}
+
+function insertPost(post) {
+    $.ajax({
+        type: "POST",
+        url: "/post/post/api/insert",
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(post),
+        dataType: "json",
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("新增失败", result.message);
+            }
+
+            if (data) {
+                $.MsgBox.Alert("消息", "新增成功！");
+            } else {
+                $.MsgBox.Alert("消息", "新增失败，请重试！");
+            }
+        }
+    });
+}
+
+function getPostList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
+    let post = {
+        postTitle: postTitle
+    }
+    console.log(post)
+    $.ajax({
+        url: url + "/" + pageStart + "/" + pageSize, // url where to submit the request
+        type: "GET", // type of action POST || GET
+        data: post,
+        sync: SynOrAsyn,
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+
+            console.log(data);
+            if (data == null) {
+                return;
+            }
+
+            // 当前页面开始记录数目
+            $("#data_count_start").text(data.startRow);
+            // 当前页面结束记录数
+            $("#data_count_end").text(data.endRow);
+            // 总页数
+            $("#page_count").text(data.pages);
+            postAllPage = data.pages;
+            // 总计
+            $("#data_count").text(data.total);
+            // 当前页数
+            $("#page_num").text(data.pageNum);
+            if (data.isFirstPage == true) {
+                $("#page_pre_btn").attr("disabled", "disabled")
+            } else {
+                $("#page_pre_btn").removeAttr("disabled");
+            }
+
+            if (data.isLastPage == true) {
+                $("#page_next_btn").attr("disabled", "disabled")
+            } else {
+                $("#page_next_btn").removeAttr("disabled");
+            }
+
+
+            // 渲染页面
+            let list = data.list;
+            if (list.length > 0) {
+                let content = '';
+                $('.post_data').empty();
+                for (let i in list) {
+                    content = content + '<tr bgcolor="#FFFFFF"><td align="center" width="20">' +
+                        ' <input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"> </td>' +
+                        '<td valign="center" align="center" width="30">' + list[i].postPageViews + ' </td>' +
+                        '<td valign="center" align="center" width="30">' + list[i].postCommentSize + ' </td>' +
+                        '<td valign="center" align="center" width="110"> ' +
+                        '<a href="" onclick="post_detailed(\'' + list[i].id + '\');' +
+                        ' return false;">' + list[i].postTitle + '</a></td>' +
+                        '<td valign="center" align="center" width="110">' + list[i].username + ' </td>' +
+                        '<td valign="center" align="center" width="100">' + list[i].createTime + '</td>' +
+                        '<td valign="center" align="center" width="100">' + list[i].lastComment + '</td>' +
+                        '</tr>';
+                }
+                $('.post_data').append(content);
+            } else {
+                $('.post_data').empty();
+            }
+        }
+    });
+}
+
+function checkResultAndGetData($result) {
+    if ($result.success == false) {
+        throw $result;
+    }
+    return $result.data;
 }
 
 function showPostlist(postList, postAllNum, allPage, pageIndex) {
@@ -70,13 +184,14 @@ function showPostlist(postList, postAllNum, allPage, pageIndex) {
 
 function GOTO_POST_NEXT_PAGE() {
 
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, postPageIndex + 1, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    postPageIndex = postPageIndex + 1
+    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 }
 
 function GOTO_POST_TAIL_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, postAllPage - 1, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    getPostList(searchNameVal, postAllPage, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 }
 
 function GOTO_POST_PAGE() {
@@ -97,25 +212,27 @@ function GOTO_POST_PAGE() {
         $.MsgBox.Alert("消息", "页码超出上限");
         return;
     }
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, jumpVal - 1, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    getPostList(searchNameVal, jumpVal, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 }
 
 
 function GOTO_POST_HOME_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 }
 
 function GOTO_POST_PREVIOUS_PAGE() {
-    var searchNameVal = $("#SEARCH_POST_NAME_HIDDEN").val().trim();
-    getPostList(searchNameVal, postPageIndex - 1, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+    postPageIndex = postPageIndex - 1;
+    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 
 }
 
 function searchByPostName() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, 0, everyPageDataCount, true, "/postbar/myPostController/getMyPostList");
+    getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/post/api/myPageListByEntity");
 }
 
 function post_detailed(postUUID) {
@@ -133,8 +250,35 @@ function DELETE_POST() {
         $.MsgBox.Alert("消息", "请先选择需要删除的文章");
         return;
     }
-
+    deletePost(chk_value);
 }
 
+function deletePost(ids) {
+    // 发送请求
+    $.ajax({
+        url: "/post/post/api/delete", // url where to submit the request
+        type: "DELETE", // type of action POST || GET
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        data: JSON.stringify(ids),
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                alert(JSON.stringify(error));
+                return;
+            }
+            console.log(data);
+
+            $.MsgBox.Alert("消息", "删除成功");
+            let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+            getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/pageListByEntity");
+        }
+    });
+    // window.location = "${ctx }/user/removeUser?ids=" + ids.get();
+}
 
 

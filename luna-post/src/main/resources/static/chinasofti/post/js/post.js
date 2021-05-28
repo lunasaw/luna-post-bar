@@ -222,7 +222,7 @@ function GOTO_POST_HOME_PAGE() {
 
 function GOTO_POST_PREVIOUS_PAGE() {
     var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    postPageIndex = postPageIndex - 1
+    postPageIndex = postPageIndex - 1;
     getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/pageListByEntity");
 
 }
@@ -236,7 +236,7 @@ function searchByPostName() {
 function post_detailed(postUUID) {
 
 
-    window.location.replace("comment.html?page=post&postid=0000000000000");
+    window.location.replace("comment.html?page=post&postid=" + postUUID);
 
 }
 

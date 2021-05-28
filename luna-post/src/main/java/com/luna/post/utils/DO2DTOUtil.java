@@ -5,12 +5,10 @@ import com.luna.baidu.req.VoiceSynthesisReq;
 import com.luna.common.date.DateUtil;
 import com.luna.common.net.HttpUtils;
 import com.luna.common.os.SystemInfoUtil;
+import com.luna.post.dto.CommentDTO;
 import com.luna.post.dto.PostDTO;
 import com.luna.post.dto.ShowUserDTO;
-import com.luna.post.entity.Audio;
-import com.luna.post.entity.Post;
-import com.luna.post.entity.Register;
-import com.luna.post.entity.User;
+import com.luna.post.entity.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -78,5 +76,25 @@ public class DO2DTOUtil {
         voiceSynthesisReq.setPit(String.valueOf(audio.getAudioPit()));
         voiceSynthesisReq.setVol(String.valueOf(audio.getAudioVol()));
         return voiceSynthesisReq;
+    }
+
+    public static CommentDTO comment2CommentDTO(Comment comment, String username, Date userTime, String photo) {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setUsername(username);
+        commentDTO.setUserTime(userTime != null
+            ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, userTime) : "");
+        commentDTO.setPhoto(photo);
+        commentDTO.setId(comment.getId());
+        commentDTO.setPostId(comment.getPostId());
+        commentDTO.setUserId(comment.getUserId());
+        commentDTO.setContent(comment.getContent());
+        commentDTO.setAudio(comment.getAudio());
+        commentDTO.setCreateTime(comment.getCreateTime() != null
+            ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, comment.getCreateTime()) : "");
+        commentDTO.setModifiedTime(comment.getModifiedTime() != null
+            ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, comment.getModifiedTime()) : "");
+        commentDTO.setVersion(comment.getVersion());
+        return commentDTO;
+
     }
 }
