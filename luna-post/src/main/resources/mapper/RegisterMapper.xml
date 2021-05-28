@@ -240,7 +240,7 @@
             <if test="where.photo != null and photo != ''">
                 and photo = #{where.photo,jdbcType=VARCHAR}
             </if>
-            and version = #{where.version,jdbcType=OTHER} + 1
+            and version = #{where.version,jdbcType=OTHER}
         </where>
     </update>
 

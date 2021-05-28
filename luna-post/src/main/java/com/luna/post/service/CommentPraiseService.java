@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * @Author: luna
- * @CreateTime: 2021-05-27 17:20:07
+ * @CreateTime: 2021-05-28 22:17:26
  */
 public interface CommentPraiseService {
 
@@ -41,8 +41,8 @@ public interface CommentPraiseService {
      * 条件分页查询
      *
      * @param commentPraise 查询条件
-     * @param page          起始标号
-     * @param pageSize      查询条目
+     * @param page 起始标号
+     * @param pageSize 查询条目
      * @return 对象列表
      */
     PageInfo<CommentPraise> listPageByEntity(int page, int pageSize, CommentPraise commentPraise);
@@ -50,7 +50,7 @@ public interface CommentPraiseService {
     /**
      * 条件分页查询
      *
-     * @param page     起始标号
+     * @param page 起始标号
      * @param pageSize 查询条目
      * @return 对象列表
      */

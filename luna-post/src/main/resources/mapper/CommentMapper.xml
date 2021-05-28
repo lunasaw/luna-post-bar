@@ -155,7 +155,7 @@
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
             (#{item.id,jdbcType=INTEGER}, #{item.postId,jdbcType=INTEGER}, #{item.userId,jdbcType=VARCHAR},
-            #{item.content,jdbcType=VARCHAR}, #{item.audio,jdbcType=VARCHAR}, ( now(),
+            #{item.content,jdbcType=VARCHAR}, #{item.audio,jdbcType=VARCHAR}, now(),
             now(),
             0,)
         </foreach>
@@ -218,7 +218,7 @@
             <if test="where.audio != null and audio != ''">
                 and audio = #{where.audio,jdbcType=VARCHAR}
             </if>
-            and version = #{where.version,jdbcType=OTHER} + 1
+            and version = #{where.version,jdbcType=OTHER}
         </where>
     </update>
 

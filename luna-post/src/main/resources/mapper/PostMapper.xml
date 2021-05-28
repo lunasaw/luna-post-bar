@@ -169,7 +169,7 @@
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
             (#{item.id,jdbcType=INTEGER}, #{item.userId,jdbcType=INTEGER}, #{item.postTitle,jdbcType=VARCHAR},
             #{item.postText,jdbcType=VARCHAR}, #{item.postPageViews,jdbcType=INTEGER},
-            #{item.postAudio,jdbcType=VARCHAR}, ( now(),
+            #{item.postAudio,jdbcType=VARCHAR}, now(),
             now(),
             0,)
         </foreach>
@@ -241,7 +241,7 @@
             <if test="where.postAudio != null and postAudio != ''">
                 and post_audio = #{where.postAudio,jdbcType=VARCHAR}
             </if>
-            and version = #{where.version,jdbcType=OTHER} + 1
+            and version = #{where.version,jdbcType=OTHER}
         </where>
     </update>
 

@@ -1,18 +1,14 @@
 package com.luna.post.controller;
 
-import com.github.pagehelper.PageInfo;
-import com.luna.common.dto.ResultDTO;
-import com.luna.common.dto.constant.ResultCode;
 import com.luna.post.entity.CommentPraise;
 import com.luna.post.service.CommentPraiseService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
 /**
  * @Author: luna
- * @CreateTime: 2021-05-27 17:20:07
+ * @CreateTime: 2021-05-28 22:17:26
  */
 @RestController
 @RequestMapping("/commentPraise/api")
@@ -24,12 +20,14 @@ public class CommentPraiseController {
     @GetMapping("/get/{id}")
     public ResultDTO<CommentPraise> getById(@PathVariable(value = "id") Long id) {
         CommentPraise commentPraise = commentPraiseService.getById(id);
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraise);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraise);
     }
 
     @GetMapping("/get")
     public ResultDTO<CommentPraise> getByEntity(CommentPraise commentPraise) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraiseService.getByEntity(commentPraise));
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraiseService.getByEntity(commentPraise));
     }
 
     @GetMapping("/list")
@@ -39,13 +37,15 @@ public class CommentPraiseController {
     }
 
     @GetMapping("/pageListByEntity/{page}/{size}")
-    public ResultDTO<PageInfo<CommentPraise>> listPageByEntity(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size, CommentPraise commentPraise) {
+    public ResultDTO<PageInfo<CommentPraise>> listPageByEntity(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size, CommentPraise commentPraise) {
         PageInfo<CommentPraise> pageInfo = commentPraiseService.listPageByEntity(page, size, commentPraise);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
     @GetMapping("/pageList/{page}/{size}")
-    public ResultDTO<PageInfo<CommentPraise>> listPage(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size) {
+    public ResultDTO<PageInfo<CommentPraise>> listPage(@PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size) {
         PageInfo<CommentPraise> pageInfo = commentPraiseService.listPage(page, size);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
@@ -64,22 +64,26 @@ public class CommentPraiseController {
 
     @PutMapping("/update")
     public ResultDTO<Boolean> update(@RequestBody CommentPraise commentPraise) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraiseService.update(commentPraise) == 1);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraiseService.update(commentPraise) == 1);
     }
 
     @PutMapping("/updateBatch")
     public ResultDTO<Boolean> update(@RequestBody List<CommentPraise> list) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraiseService.updateBatch(list) == list.size());
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraiseService.updateBatch(list) == list.size());
     }
 
     @DeleteMapping("/delete/{id}")
     public ResultDTO<Boolean> deleteOne(@PathVariable(value = "id") Long id) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraiseService.deleteById(id) == 1);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraiseService.deleteById(id) == 1);
     }
 
     @DeleteMapping("/deleteByEntity")
     public ResultDTO<Boolean> deleteOne(@RequestBody CommentPraise commentPraise) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentPraiseService.deleteByEntity(commentPraise) == 1);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentPraiseService.deleteByEntity(commentPraise) == 1);
     }
 
     @DeleteMapping("/delete")
@@ -99,6 +103,6 @@ public class CommentPraiseController {
     @GetMapping("/accountByEntity")
     public ResultDTO<Integer> getAccountByEntity(CommentPraise commentPraise) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
-                commentPraiseService.countByEntity(commentPraise));
+            commentPraiseService.countByEntity(commentPraise));
     }
 }

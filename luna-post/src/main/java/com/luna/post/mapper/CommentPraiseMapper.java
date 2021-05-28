@@ -3,13 +3,12 @@ package com.luna.post.mapper;
 import com.luna.post.entity.CommentPraise;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import javax.validation.constraints.*;
 import java.util.List;
 
 /**
  * @Author: luna
- * @CreateTime: 2021-05-27 17:20:07
+ * @CreateTime: 2021-05-28 22:17:26
  */
 @Mapper
 public interface CommentPraiseMapper {

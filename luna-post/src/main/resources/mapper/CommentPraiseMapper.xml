@@ -4,6 +4,7 @@
 
     <resultMap type="com.luna.post.entity.CommentPraise" id="CommentPraiseResultMap">
         <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="praise" column="praise" jdbcType="INTEGER"/>
         <result property="postId" column="post_id" jdbcType="INTEGER"/>
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
         <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
@@ -13,7 +14,7 @@
     </resultMap>
 
     <sql id="table_field">
-      id, post_id, user_id, comment_id, create_time, modified_time, version      
+      id, praise, post_id, user_id, comment_id, create_time, modified_time, version      
     </sql>
 
     <!--通过Id查询单个-->
@@ -33,6 +34,9 @@
         <where>
             <if test="id != null  ">
                 and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="praise != null  ">
+                and praise = #{praise,jdbcType=INTEGER}
             </if>
             <if test="postId != null  ">
                 and post_id = #{postId,jdbcType=INTEGER}
@@ -63,6 +67,9 @@
         <where>
             <if test="id != null  ">
                 and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="praise != null  ">
+                and praise = #{praise,jdbcType=INTEGER}
             </if>
             <if test="postId != null  ">
                 and post_id = #{postId,jdbcType=INTEGER}
@@ -103,6 +110,9 @@
             <if test="id != null  ">
                 id,
             </if>
+            <if test="praise != null  ">
+                praise,
+            </if>
             <if test="postId != null  ">
                 post_id,
             </if>
@@ -119,6 +129,9 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null  ">
                 #{id,jdbcType=INTEGER},
+            </if>
+            <if test="praise != null  ">
+                #{praise,jdbcType=INTEGER},
             </if>
             <if test="postId != null  ">
                 #{postId,jdbcType=INTEGER},
@@ -138,11 +151,11 @@
     <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true" parameterType="list">
         insert into tb_comment_praise
-        (post_id, user_id, comment_id, create_time, modified_time, version)
+        (praise, post_id, user_id, comment_id, create_time, modified_time, version)
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
-            (#{item.id,jdbcType=INTEGER}, #{item.postId,jdbcType=INTEGER}, #{item.userId,jdbcType=INTEGER},
-            #{item.commentId,jdbcType=INTEGER}, ( now(),
+            (#{item.id,jdbcType=INTEGER}, #{item.praise,jdbcType=INTEGER}, #{item.postId,jdbcType=INTEGER},
+            #{item.userId,jdbcType=INTEGER}, #{item.commentId,jdbcType=INTEGER}, now(),
             now(),
             0,)
         </foreach>
@@ -152,6 +165,9 @@
     <update id="update" parameterType="com.luna.post.entity.CommentPraise">
         update tb_comment_praise
         <set>
+            <if test="praise != null  ">
+                praise = #{praise,jdbcType=INTEGER},
+            </if>
             <if test="postId != null  ">
                 post_id = #{postId,jdbcType=INTEGER},
             </if>
@@ -171,6 +187,9 @@
     <update id="updateByField">
         update tb_comment_praise
         <set>
+            <if test="where.praise == null and set.praise != null">
+                praise = #{set.praise,jdbcType=INTEGER},
+            </if>
             <if test="where.postId == null and set.postId != null">
                 post_id = #{set.postId,jdbcType=INTEGER},
             </if>
@@ -187,6 +206,9 @@
             <if test="where.id != null and id != ''">
                 and id = #{where.id,jdbcType=INTEGER}
             </if>
+            <if test="where.praise != null and praise != ''">
+                and praise = #{where.praise,jdbcType=INTEGER}
+            </if>
             <if test="where.postId != null and postId != ''">
                 and post_id = #{where.postId,jdbcType=INTEGER}
             </if>
@@ -196,7 +218,15 @@
             <if test="where.commentId != null and commentId != ''">
                 and comment_id = #{where.commentId,jdbcType=INTEGER}
             </if>
-            and version = #{where.version,jdbcType=OTHER} + 1
+            <if test="where.createTime != null and createTime != ''">
+                and create_time = #{where.createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="where.modifiedTime != null and modifiedTime != ''">
+                and modified_time = #{where.modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="where.version != null and version != ''">
+                and version = #{where.version,jdbcType=OTHER}
+            </if>
         </where>
     </update>
 
@@ -204,6 +234,11 @@
     <update id="updateBatch" parameterType="list">
         update tb_comment_praise
         <trim prefix="set" suffixOverrides=",">
+            <trim prefix="praise = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.praise}
+                </foreach>
+            </trim>
             <trim prefix="post_id = case" suffix="end,">
                 <foreach collection="list" item="item" index="index">
                     when id = #{item.id} then #{item.postId}
@@ -245,6 +280,9 @@
     <delete id="deleteByEntity" parameterType="com.luna.post.entity.CommentPraise">
         delete from tb_comment_praise
         <where>
+            <if test="praise != null  ">
+                and praise = #{praise,jdbcType=INTEGER}
+            </if>
             <if test="postId != null  ">
                 and post_id = #{postId,jdbcType=INTEGER}
             </if>
@@ -262,7 +300,9 @@
             </if>
             and id = #{id,jdbcType=INTEGER} and version = #{version,jdbcType=OTHER}
         </where>
-    </delete><!--通过主键列表删除，列表长度不能为0-->
+    </delete>
+
+    <!--通过主键列表删除，列表长度不能为0-->
     <delete id="deleteByIds" parameterType="list">
         delete from tb_comment_praise where id in
         <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
@@ -279,6 +319,9 @@
         <where>
             <if test="id != null  ">
                 and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="praise != null  ">
+                and praise = #{praise,jdbcType=INTEGER}
             </if>
             <if test="postId != null  ">
                 and post_id = #{postId,jdbcType=INTEGER}
