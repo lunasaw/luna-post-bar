@@ -39,12 +39,14 @@ public interface PostService {
     /**
      * 条件分页查询
      *
-     * @param post 查询条件
+     *
+     * @param oneSessionKey
      * @param page 起始标号
      * @param pageSize 查询条目
+     * @param post 查询条件
      * @return 对象列表
      */
-    PageInfo<PostDTO> listPageByEntity(int page, int pageSize, Post post);
+    PageInfo<PostDTO> listPageByEntity(String oneSessionKey, int page, int pageSize, Post post);
 
     /**
      * 条件分页查询
@@ -145,5 +147,5 @@ public interface PostService {
      * @param post
      * @return
      */
-    PageInfo<PostDTO> MyListPageByEntity(String oneSessionKey, int page, int size, Post post);
+    PageInfo<PostDTO> myListPageByEntity(String oneSessionKey, int page, int size, Post post);
 }

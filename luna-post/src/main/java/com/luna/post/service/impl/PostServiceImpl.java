@@ -1,25 +1,41 @@
 package com.luna.post.service.impl;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Date;
+
+import com.luna.baidu.api.BaiduVoiceApi;
+import com.luna.baidu.config.BaiduKeyGenerate;
+import com.luna.baidu.config.BaiduProperties;
+import com.luna.baidu.req.VoiceSynthesisReq;
+import com.luna.common.date.DateUtil;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.file.FileTools;
+import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.PostDTO;
-import com.luna.post.entity.Comment;
-import com.luna.post.entity.User;
-import com.luna.post.entity.UserException;
+import com.luna.post.entity.*;
+import com.luna.post.mapper.AudioMapper;
 import com.luna.post.mapper.CommentMapper;
 import com.luna.post.mapper.PostMapper;
 import com.luna.post.mapper.UserMapper;
 import com.luna.post.service.PostService;
-import com.luna.post.entity.Post;
+import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
+import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,17 +46,26 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private PostMapper    postMapper;
+    @Resource
+    private PostMapper      postMapper;
 
-    @Autowired
-    private CommentMapper commentMapper;
+    @Resource
+    private CommentMapper   commentMapper;
 
-    @Autowired
-    private UserMapper    userMapper;
+    @Resource
+    private UserMapper      userMapper;
 
-    @Autowired
-    private RedisHashUtil redisHashUtil;
+    @Resource
+    private AudioMapper     audioMapper;
+
+    @Resource
+    private UserManager     userManager;
+
+    @Resource
+    private RedisHashUtil   redisHashUtil;
+
+    @Resource
+    private BaiduProperties baiduProperties;
 
     @Override
     public Post getById(Long id) {
@@ -58,9 +83,20 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageInfo<PostDTO> listPageByEntity(int page, int pageSize, Post post) {
-        PageHelper.startPage(page, pageSize);
-        return getPostDTOPageInfo(post);
+    public PageInfo<PostDTO> listPageByEntity(String sessionKey, int page, int pageSize, Post post) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+
+        if (Objects.equals(user.getAdmin(), "1")) {
+            PageHelper.startPage(page, pageSize);
+            return getPostDTOPageInfo(post);
+        } else {
+            PageHelper.startPage(page, pageSize);
+            post.setUserId(user.getId());
+            return getPostDTOPageInfo(post);
+        }
     }
 
     @Override
@@ -84,6 +120,33 @@ public class PostServiceImpl implements PostService {
         post.setUserId(user.getId());
 
         // TODO 这里需要讲内容转为语音
+        Audio byEntity = audioMapper.getByEntity(new Audio(user.getId()));
+
+        if (byEntity == null) {
+            byEntity = new Audio();
+            byEntity.setUserId(user.getId());
+            byEntity.setAudioSpd(5);
+            byEntity.setAudioPit(5);
+            byEntity.setAudioVol(5);
+            byEntity.setAudioVoiPer(0);
+            audioMapper.insert(byEntity);
+        }
+
+        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getMac(),
+            post.getPostText(), baiduProperties.getBaiduKey(), byEntity);
+
+        if (voiceSynthesisReq != null) {
+            try {
+                byte[] bytes = BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq);
+                String fileName = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
+                    + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
+                FileTools.createDirectory(fileName);
+                FileTools.write(bytes, fileName);
+                post.setPostAudio(userManager.getPath() + "/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return postMapper.insert(post);
     }
 
@@ -128,7 +191,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageInfo<PostDTO> MyListPageByEntity(String sessionKey, int page, int size, Post post) {
+    public PageInfo<PostDTO> myListPageByEntity(String sessionKey, int page, int size, Post post) {
         if (sessionKey == null) {
             throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
         }

@@ -1,13 +1,20 @@
 package com.luna.post.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.luna.baidu.req.VoiceSynthesisReq;
 import com.luna.common.date.DateUtil;
+import com.luna.common.net.HttpUtils;
+import com.luna.common.os.SystemInfoUtil;
 import com.luna.post.dto.PostDTO;
 import com.luna.post.dto.ShowUserDTO;
+import com.luna.post.entity.Audio;
 import com.luna.post.entity.Post;
 import com.luna.post.entity.Register;
 import com.luna.post.entity.User;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -46,7 +53,7 @@ public class DO2DTOUtil {
         PostDTO postDTO = new PostDTO();
         postDTO.setUsername(username);
         postDTO.setLastComment(
-            lastComment != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, post.getCreateTime()) : "");
+            lastComment != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, post.getCreateTime()) : "");
         postDTO.setPostCommentSize(readCount != null ? readCount : 0);
         postDTO.setId(post.getId());
         postDTO.setUserId(post.getUserId());
@@ -55,10 +62,21 @@ public class DO2DTOUtil {
         postDTO.setPostPageViews(post.getPostPageViews());
         postDTO.setPostAudio(post.getPostAudio());
         postDTO.setCreateTime(
-            post.getCreateTime() != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, post.getCreateTime()) : "");
+            post.getCreateTime() != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, post.getCreateTime())
+                : "");
         postDTO.setModifiedTime(
-            post.getModifiedTime() != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, post.getModifiedTime()) : "");
+            post.getModifiedTime() != null
+                ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, post.getModifiedTime()) : "");
         postDTO.setVersion(post.getVersion());
         return postDTO;
+    }
+
+    public static VoiceSynthesisReq audio2VoiceSynthesisReq(String cuid, String tex, String tok, Audio audio) {
+        VoiceSynthesisReq voiceSynthesisReq = new VoiceSynthesisReq(cuid, tex, tok);
+        voiceSynthesisReq.setPer(String.valueOf(audio.getAudioVoiPer()));
+        voiceSynthesisReq.setSpd(String.valueOf(audio.getAudioSpd()));
+        voiceSynthesisReq.setPit(String.valueOf(audio.getAudioPit()));
+        voiceSynthesisReq.setVol(String.valueOf(audio.getAudioVol()));
+        return voiceSynthesisReq;
     }
 }

@@ -46,6 +46,14 @@ public class UserManager {
     @Value("${luna.nginx.path}")
     private String         path = "http://127.0.0.1:8081";
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public boolean uploadImg(String sessionKey, MultipartFile file) {
         if (sessionKey == null) {
             throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");

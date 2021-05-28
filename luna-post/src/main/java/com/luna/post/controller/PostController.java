@@ -42,9 +42,11 @@ public class PostController {
     }
 
     @GetMapping("/pageListByEntity/{page}/{size}")
-    public ResultDTO<PageInfo<PostDTO>> listPageByEntity(@PathVariable(value = "page") int page,
+    public ResultDTO<PageInfo<PostDTO>> listPageByEntity(HttpServletRequest httpServletRequest,
+        @PathVariable(value = "page") int page,
         @PathVariable(value = "size") int size, Post post) {
-        PageInfo<PostDTO> pageInfo = postService.listPageByEntity(page, size, post);
+        PageInfo<PostDTO> pageInfo =
+            postService.listPageByEntity(CookieUtils.getOneSessionKey(httpServletRequest), page, size, post);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
@@ -52,7 +54,7 @@ public class PostController {
     public ResultDTO<PageInfo<PostDTO>> myPageListByEntity(HttpServletRequest httpServletRequest,
         @PathVariable(value = "page") int page, @PathVariable(value = "size") int size, Post post) {
         PageInfo<PostDTO> pageInfo =
-            postService.MyListPageByEntity(CookieUtils.getOneSessionKey(httpServletRequest), page, size, post);
+            postService.myListPageByEntity(CookieUtils.getOneSessionKey(httpServletRequest), page, size, post);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
