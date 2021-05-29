@@ -32,6 +32,13 @@ public class CommentPraise implements Serializable {
         this.postId = postId;
     }
 
+    public CommentPraise(Integer praise, Long postId, Long userId, Long commentId) {
+        this.praise = praise;
+        this.postId = postId;
+        this.userId = userId;
+        this.commentId = commentId;
+    }
+
     public CommentPraise() {}
 
     public Long getId() {

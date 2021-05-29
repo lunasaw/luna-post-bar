@@ -636,7 +636,7 @@ function sysUser() {
         contentType: 'application/json;charset=UTF-8',
         dataType: "json",
         success: function (result) {
-            console.log(result);
+            // console.log(result);
             let data;
             try {
                 data = checkResultAndGetData(result);

@@ -85,6 +85,7 @@ function insertPost(post) {
 
             if (data) {
                 $.MsgBox.Alert("消息", "新增成功！");
+                window.location.replace("post.html");
             } else {
                 $.MsgBox.Alert("消息", "新增失败，请重试！");
             }
@@ -96,7 +97,7 @@ function getPostList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
     let post = {
         postTitle: postTitle
     }
-    console.log(post)
+    // console.log(post)
     $.ajax({
         url: url + "/" + pageStart + "/" + pageSize, // url where to submit the request
         type: "GET", // type of action POST || GET
@@ -113,7 +114,7 @@ function getPostList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
                 return;
             }
 
-            console.log(data);
+            // console.log(data);
             if (data == null) {
                 return;
             }
@@ -234,10 +235,7 @@ function searchByPostName() {
 
 // 详情
 function post_detailed(postUUID) {
-
-
     window.location.replace("comment.html?page=post&postid=" + postUUID);
-
 }
 
 function DELETE_POST() {

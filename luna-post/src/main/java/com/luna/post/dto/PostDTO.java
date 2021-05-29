@@ -1,7 +1,6 @@
 package com.luna.post.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 文章帖子
@@ -38,6 +37,11 @@ public class PostDTO implements Serializable {
      * 文章评论数
      */
     private Integer           postCommentSize;
+
+    /**
+     * 赞
+     */
+    private Integer           praise;
     /**
      * 文章音频
      */
@@ -105,6 +109,14 @@ public class PostDTO implements Serializable {
 
     public void setPostPageViews(Long postPageViews) {
         this.postPageViews = postPageViews;
+    }
+
+    public Integer getPraise() {
+        return praise;
+    }
+
+    public void setPraise(Integer praise) {
+        this.praise = praise;
     }
 
     public String getPostAudio() {

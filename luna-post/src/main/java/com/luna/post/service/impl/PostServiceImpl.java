@@ -1,12 +1,8 @@
 package com.luna.post.service.impl;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Date;
 
 import com.luna.baidu.api.BaiduVoiceApi;
-import com.luna.baidu.config.BaiduKeyGenerate;
 import com.luna.baidu.config.BaiduProperties;
 import com.luna.baidu.req.VoiceSynthesisReq;
 import com.luna.common.date.DateUtil;
@@ -16,18 +12,15 @@ import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.PostDTO;
+import com.luna.post.dto.PostDeatilDTO;
+import com.luna.post.dto.ShowUserDTO;
 import com.luna.post.entity.*;
-import com.luna.post.mapper.AudioMapper;
-import com.luna.post.mapper.CommentMapper;
-import com.luna.post.mapper.PostMapper;
-import com.luna.post.mapper.UserMapper;
+import com.luna.post.mapper.*;
 import com.luna.post.service.PostService;
 import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -47,34 +40,66 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     @Resource
-    private PostMapper      postMapper;
+    private PostMapper          postMapper;
 
     @Resource
-    private CommentMapper   commentMapper;
+    private CommentMapper       commentMapper;
 
     @Resource
-    private UserMapper      userMapper;
+    private UserMapper          userMapper;
 
     @Resource
-    private AudioMapper     audioMapper;
+    private RegisterMapper      registerMapper;
 
     @Resource
-    private UserManager     userManager;
+    private AudioMapper         audioMapper;
 
     @Resource
-    private RedisHashUtil   redisHashUtil;
+    private UserManager         userManager;
 
     @Resource
-    private BaiduProperties baiduProperties;
+    private CommentPraiseMapper commentPraiseMapper;
+
+    @Resource
+    private RedisHashUtil       redisHashUtil;
+
+    @Resource
+    private BaiduProperties     baiduProperties;
 
     @Override
-    public Post getById(Long id) {
-        return postMapper.getById(id);
+    public PostDTO getById(Long id) {
+        Post post = postMapper.getById(id);
+        return getByEntity(post);
     }
 
     @Override
-    public Post getByEntity(Post post) {
-        return postMapper.getByEntity(post);
+    public PostDeatilDTO getDetail(Long id) {
+        PostDTO postDTO = getById(id);
+        User user = userMapper.getById(postDTO.getUserId());
+        Register register = registerMapper.getByEntity(new Register(user.getId()));
+        ShowUserDTO showUserDTO = DO2DTOUtil.user2ShowUserDTO(user, register);
+        return new PostDeatilDTO(postDTO, showUserDTO);
+    }
+
+    @Override
+    public PostDTO getByEntity(Post post) {
+        Post postTemp = postMapper.getByEntity(post);
+        User user = userMapper.getById(postTemp.getUserId());
+        List<Comment> comments = commentMapper.listByEntity(new Comment(postTemp.getId()));
+        Optional<Comment> first = comments.stream()
+            .sorted(Comparator.comparing(Comment::getModifiedTime).reversed()).findFirst();
+        CommentPraise comment = new CommentPraise(postTemp.getId());
+        comment.setCommentId(0L);
+        CommentPraise commentPraise = commentPraiseMapper.getByEntity(comment);
+        if (commentPraise == null) {
+            commentPraise = new CommentPraise(postTemp.getId());
+            commentPraise.setPraise(0);
+            commentPraise.setUserId(user.getId());
+            commentPraise.setCommentId(0L);
+            commentPraiseMapper.insert(commentPraise);
+        }
+        return DO2DTOUtil.postDO2PostDTO(postTemp, user.getName(),
+            first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime(), commentPraise.getPraise());
     }
 
     @Override
@@ -132,7 +157,7 @@ public class PostServiceImpl implements PostService {
             audioMapper.insert(byEntity);
         }
 
-        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getMac(),
+        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
             post.getPostText(), baiduProperties.getBaiduKey(), byEntity);
 
         if (voiceSynthesisReq != null) {
@@ -204,15 +229,7 @@ public class PostServiceImpl implements PostService {
     private PageInfo<PostDTO> getPostDTOPageInfo(Post post) {
         List<Post> list = postMapper.listByEntity(post);
         PageInfo<PostDTO> pageInfo = new PageInfo(list);
-        List<PostDTO> collect = list.stream().map(postTemp -> {
-            int i = commentMapper.countByEntity(new Comment(postTemp.getId()));
-            User byId = userMapper.getById(postTemp.getUserId());
-            List<Comment> comments = commentMapper.listByEntity(new Comment(postTemp.getId()));
-            Optional<Comment> first = comments.stream()
-                .sorted(Comparator.comparing(Comment::getModifiedTime).reversed()).findFirst();
-            return DO2DTOUtil.postDO2PostDTO(postTemp, byId.getName(),
-                first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime(), i);
-        }).collect(Collectors.toList());
+        List<PostDTO> collect = list.stream().map(postTemp -> getByEntity(postTemp)).collect(Collectors.toList());
         pageInfo.setList(collect);
         return pageInfo;
     }

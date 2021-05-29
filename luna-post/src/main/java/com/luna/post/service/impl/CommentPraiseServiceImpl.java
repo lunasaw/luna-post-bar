@@ -1,6 +1,9 @@
 package com.luna.post.service.impl;
 
+import com.luna.common.dto.constant.ResultCode;
+import com.luna.post.entity.Post;
 import com.luna.post.mapper.CommentPraiseMapper;
+import com.luna.post.mapper.PostMapper;
 import com.luna.post.service.CommentPraiseService;
 import com.luna.post.entity.CommentPraise;
 import javax.annotation.Resource;
@@ -21,6 +24,9 @@ public class CommentPraiseServiceImpl implements CommentPraiseService {
 
     @Autowired
     private CommentPraiseMapper commentPraiseMapper;
+
+    @Autowired
+    private PostMapper          postMapper;
 
     @Override
     public CommentPraise getById(Long id) {
@@ -58,7 +64,25 @@ public class CommentPraiseServiceImpl implements CommentPraiseService {
 
     @Override
     public int insert(CommentPraise commentPraise) {
-        return commentPraiseMapper.insert(commentPraise);
+
+        Post post = postMapper.getById(commentPraise.getPostId());
+        if (post == null) {
+            throw new RuntimeException("文章不存在");
+        }
+
+        CommentPraise comment = commentPraiseMapper.getByEntity(commentPraise);
+
+        // 已经有过点赞的 更新
+        if (comment != null) {
+            comment.setPraise(comment.getPraise() + 1);
+            return commentPraiseMapper.update(comment);
+        }
+        // 还未出现过则插入
+        comment = new CommentPraise(commentPraise.getPostId());
+        comment.setPraise(0);
+        comment.setUserId(post.getUserId());
+
+        return commentPraiseMapper.insert(comment);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.post.dto.PostDTO;
+import com.luna.post.dto.PostDeatilDTO;
 import com.luna.post.entity.Post;
 import com.luna.post.service.PostService;
 import com.luna.post.utils.CookieUtils;
@@ -25,14 +26,19 @@ public class PostController {
     private PostService postService;
 
     @GetMapping("/get/{id}")
-    public ResultDTO<Post> getById(@PathVariable(value = "id") Long id) {
-        Post post = postService.getById(id);
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, post);
+    public ResultDTO<PostDTO> getById(@PathVariable(value = "id") Long id) {
+        PostDTO postDTO = postService.getById(id);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, postDTO);
     }
 
     @GetMapping("/get")
-    public ResultDTO<Post> getByEntity(Post post) {
+    public ResultDTO<PostDTO> getByEntity(Post post) {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, postService.getByEntity(post));
+    }
+
+    @GetMapping("/getDetail/{id}")
+    public ResultDTO<PostDeatilDTO> getDetail(@PathVariable(value = "id") Long id) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, postService.getDetail(id));
     }
 
     @GetMapping("/list")

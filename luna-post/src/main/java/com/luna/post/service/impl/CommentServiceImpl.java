@@ -1,14 +1,23 @@
 package com.luna.post.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.luna.baidu.api.BaiduVoiceApi;
+import com.luna.baidu.config.BaiduProperties;
+import com.luna.baidu.req.VoiceSynthesisReq;
+import com.luna.common.date.DateUtil;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.file.FileTools;
+import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.*;
 import com.luna.post.mapper.*;
 import com.luna.post.service.CommentService;
 
+import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
+import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisHash;
@@ -17,6 +26,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +52,19 @@ public class CommentServiceImpl implements CommentService {
     private UserMapper          userMapper;
 
     @Resource
+    private UserManager         userManager;
+
+    @Resource
     private CommentPraiseMapper commentPraiseMapper;
 
     @Resource
+    private AudioMapper         audioMapper;
+
+    @Resource
     private RedisHashUtil       redisHashUtil;
+
+    @Resource
+    private BaiduProperties     baiduProperties;
 
     @Override
     public Comment getById(Long id) {
@@ -82,12 +101,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDTO getHot(Comment comment) {
         List<CommentPraise> commentPraises = commentPraiseMapper.listByEntity(new CommentPraise(comment.getPostId()));
+
         Optional<CommentPraise> first =
-            commentPraises.stream().sorted(Comparator.comparing(CommentPraise::getPraise).reversed()).findFirst();
+            commentPraises.stream().filter(commentPraise -> commentPraise.getCommentId() != 0)
+                .max(Comparator.comparing(CommentPraise::getPraise));
+        System.out.println(JSON.toJSONString(first.get()));
         if (first.isPresent()) {
             CommentPraise commentPraise = first.get();
             // 这条评论的用户名
-            User user = userMapper.getById(Long.valueOf(commentPraise.getUserId()));
+            User user = userMapper.getById(commentPraise.getUserId());
             Register register = registerMapper.getByEntity(new Register(user.getId()));
             Comment tempComment = commentMapper.getById(commentPraise.getCommentId());
             return DO2DTOUtil.comment2CommentDTO(tempComment, user.getName(), user.getCreateTime(),
@@ -122,9 +144,39 @@ public class CommentServiceImpl implements CommentService {
         }
 
         User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
-
         comment.setUserId(String.valueOf(user.getId()));
-        return commentMapper.insert(comment);
+        // 把文字转为语音
+
+        // TODO 这里需要讲内容转为语音
+        Audio byEntity = audioMapper.getByEntity(new Audio(user.getId()));
+
+        if (byEntity == null) {
+            byEntity = new Audio();
+            byEntity.setUserId(user.getId());
+            byEntity.setAudioSpd(5);
+            byEntity.setAudioPit(5);
+            byEntity.setAudioVol(5);
+            byEntity.setAudioVoiPer(0);
+            audioMapper.insert(byEntity);
+        }
+
+        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
+            comment.getContent(), baiduProperties.getBaiduKey(), byEntity);
+
+        if (voiceSynthesisReq != null) {
+            try {
+                byte[] bytes = BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq);
+                String fileName = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
+                    + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
+                FileTools.createDirectory(fileName);
+                FileTools.write(bytes, fileName);
+                comment.setAudio(userManager.getPath() + "/" + fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        commentMapper.insert(comment);
+        return commentPraiseMapper.insert(new CommentPraise(0, comment.getPostId(), user.getId(), comment.getId()));
     }
 
     @Override
@@ -154,6 +206,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int deleteByIds(List<Long> list) {
+
+        list.forEach(i -> {
+            Comment comment = commentMapper.getById(i);
+            CommentPraise commentPraise = new CommentPraise();
+            commentPraise.setCommentId(comment.getId());
+            commentPraiseMapper.deleteByEntity(commentPraise);
+        });
+
         return commentMapper.deleteByIds(list);
     }
 

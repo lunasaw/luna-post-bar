@@ -37,16 +37,17 @@ public class DO2DTOUtil {
         return showUserDTO;
     }
 
-    public static PostDTO postDO2PostDTO(Post post, String username, Date lastComment, Integer readCount) {
+    public static PostDTO postDO2PostDTO(Post post, String username, Date lastComment, Integer praise) {
         if (post == null) {
             return null;
         }
 
         PostDTO postDTO = new PostDTO();
         postDTO.setUsername(username);
+        postDTO.setPraise(praise != null ? praise : 0);
         postDTO.setLastComment(
             lastComment != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, post.getCreateTime()) : "");
-        postDTO.setPostCommentSize(readCount != null ? readCount : 0);
+        postDTO.setPostCommentSize(Math.toIntExact(post.getPostPageViews() != null ? post.getPostPageViews() : 0));
         postDTO.setId(post.getId());
         postDTO.setUserId(post.getUserId());
         postDTO.setPostTitle(post.getPostTitle());
@@ -64,6 +65,9 @@ public class DO2DTOUtil {
     }
 
     public static VoiceSynthesisReq audio2VoiceSynthesisReq(String cuid, String tex, String tok, Audio audio) {
+        if (audio == null) {
+            return null;
+        }
         VoiceSynthesisReq voiceSynthesisReq = new VoiceSynthesisReq(cuid, tex, tok);
         voiceSynthesisReq.setPer(String.valueOf(audio.getAudioVoiPer()));
         voiceSynthesisReq.setSpd(String.valueOf(audio.getAudioSpd()));
@@ -74,6 +78,9 @@ public class DO2DTOUtil {
 
     public static CommentDTO comment2CommentDTO(Comment comment, String username, Date userTime, String photo,
         Integer praise) {
+        if (comment == null) {
+            return null;
+        }
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setPostPraise(praise);
         commentDTO.setUsername(username);

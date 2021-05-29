@@ -31,20 +31,131 @@ $(function () {
     returnpage = GetQueryString("page");
 
     getCommentList(postUUID, true, "/post/comment/api/list");
+
+
+    getHost(postUUID, true, "/post/comment/api/getHot");
+
+    getPostDetail(postUUID, true, "/post/post/api/getDetail");
 });
 
-function getCommentList(postUUID, SynOrAsyn, url) {
+function getPostDetail(postUUID, SynOrAsyn, url) {
+    $.ajax({
+        url: url + "/" + postUUID, // url where to submit the request
+        type: "GET", // type of action POST || GET
+        sync: SynOrAsyn,
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(data));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+
+            // console.log(data);
+            if (data == null) {
+                return;
+            }
+            // 渲染页面
+            if (data !== null) {
+                let user = data.showUserDTO;
+                let post = data.postDTO
+                let content = '';
+                $('#post_data').empty();
+
+                content = content + '<div class="card-body"><div class="row"><div class="col-md-11">' +
+                    '<div class="form-inline col-md-11" style="width:100%"><div class="form-group " style="width:100%">' +
+                    '<div id="postPhoto"><img src="' + user.photo + '" style="whith:80px;height:80px"></div>&nbsp;&nbsp;' +
+                    '<div id="postInfo"><table>' +
+                    '<tbody><tr>' +
+                    '<td>主题：' + post.postTitle + '</td></tr>' +
+                    '<tr><td>发帖人：' + user.name + '</td></tr>' +
+                    '<tr><td>发帖人注册时间: ' + user.createTime + '</td></tr>' +
+                    '<tr><td>发帖时间：' + post.createTime + '</td></tr>' +
+                    '</tbody></table></div></div></div></div></div></div>' +
+                    '<div id="postText"><span>' + post.postText + '</span></div>' +
+                    '<div id="postAtt"><audio src="' + post.postAudio + '" controls="controls" ' +
+                    'style="height:20px"></audio>&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
+                    'onclick="hotsPraiseClick(\'' + post.id + '\',\'' + post.id + '\')">赞：' +
+                    '</a>' + post.praise + '</div>';
+
+                $('#post_data').append(content);
+            } else {
+                $('#post_data').empty();
+            }
+        }
+    });
+}
+
+function getHost(postUUID, SynOrAsyn, url) {
     let comment = {
         postId: postUUID
     }
-    console.log(comment)
+    // console.log(comment)
     $.ajax({
         url: url, // url where to submit the request
         type: "GET", // type of action POST || GET
         data: comment,
         sync: SynOrAsyn,
         success: function (result) {
-            console.log(result);
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(error));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+
+            // console.log(data);
+            if (data == null) {
+                return;
+            }
+            // 渲染页面
+            if (data !== null) {
+                let content = '';
+                $('#comment_hot_data').empty();
+
+                content = content + '<div class="form-inline col-sm-12">' +
+                    '<div><img src="' + data.photo + '" style="whith:80px;height:80px"></div>&nbsp;&nbsp;' +
+                    '<div>' +
+                    '<table>' +
+                    '<tbody>' +
+                    '<tr><td>评论人：' + data.username + '</td></tr>' +
+                    '<tr><td>评论人注册时间:' + data.userTime + '</td></tr>' +
+                    '<tr><td>评论时间：' + data.createTime + '</td></tr>' +
+                    '<tr><td>删除选中：<input name="DELETE_CHECK_NAME" type="checkbox" value="' + data.id + '"></td></tr>' +
+                    '</tbody></table></div></div><div class="col-sm-12">' +
+                    '<span>' + data.content + '</span></div><div class="col-sm-12">' +
+                    '<audio src="' + data.audio + '" controls="controls" style="height:20px"></audio>' +
+                    '&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
+                    'onclick="hotsPraiseClick(\'' + data.postId + '\',\'' + data.id + '\')">' +
+                    '赞：</a>' + data.postPraise + '</div>';
+                $('#comment_hot_data').append(content);
+            } else {
+                $('#comment_hot_data').empty();
+            }
+        }
+    });
+}
+
+function getCommentList(postUUID, SynOrAsyn, url) {
+    let comment = {
+        postId: postUUID
+    }
+    // console.log(comment)
+    $.ajax({
+        url: url, // url where to submit the request
+        type: "GET", // type of action POST || GET
+        data: comment,
+        sync: SynOrAsyn,
+        success: function (result) {
+            // console.log(result);
             let data;
             try {
                 data = checkResultAndGetData(result);
@@ -67,14 +178,14 @@ function getCommentList(postUUID, SynOrAsyn, url) {
                 for (let i in list) {
 
                     content = content + '<div class="form-inline col-sm-12">' +
-                        '<div><img src="' + list[i].photo + '" style="whith:80px;height:80px"></div>' +
+                        '<div><img src="' + list[i].photo + '" style="whith:80px;height:80px"></div>&nbsp;&nbsp;' +
                         '<div>' +
                         '<table>' +
                         '<tbody>' +
                         '<tr><td>评论人：' + list[i].username + '</td></tr>' +
                         '<tr><td>评论人注册时间:' + list[i].userTime + '</td></tr>' +
                         '<tr><td>评论时间：' + list[i].createTime + '</td></tr>' +
-                        '<tr><td>删除选中：<input name="DELETE_CHECK_NAME" type="checkbox" value="c9c8ee13e83149379d56d34ea7913d69"></td></tr>' +
+                        '<tr><td>删除选中：<input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"></td></tr>' +
                         '</tbody></table></div></div><div class="col-sm-12">' +
                         '<span>' + list[i].content + '</span></div><div class="col-sm-12">' +
                         '<audio src="' + list[i].audio + '" controls="controls" style="height:20px"></audio>' +
@@ -112,7 +223,30 @@ function allCommentlist(allCommentlist, admin) {
 }
 
 function hotsPraiseClick(postUUID, cmUUID) {
+    $.ajax({
+        type: "POST",
+        url: "/post/post/api/parise",
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(comment),
+        dataType: "json",
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("新增失败", result.message);
+            }
 
+            if (data) {
+                $.MsgBox.Alert("消息", "新增成功！");
+                window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
+            } else {
+                $.MsgBox.Alert("消息", "新增失败，请重试！");
+            }
+        }
+    });
+    $.MsgBox.Alert("消息", "您已点过了赞");
 
 }
 
@@ -124,10 +258,37 @@ function addComCheck() {
         return;
     }
 
+    let comment = {
+        postId: postUUID,
+        content: cmText
+    }
+    insertComment(comment);
+}
 
-    window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
+function insertComment(comment) {
+    $.ajax({
+        type: "POST",
+        url: "/post/comment/api/insert",
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(comment),
+        dataType: "json",
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("新增失败", result.message);
+            }
 
-
+            if (data) {
+                $.MsgBox.Alert("消息", "新增成功！");
+                window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
+            } else {
+                $.MsgBox.Alert("消息", "新增失败，请重试！");
+            }
+        }
+    });
 }
 
 function returnComList() {
@@ -159,10 +320,37 @@ function DELETE_COM() {
     }
 
 
-    window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
-
-
+    deleteComment(chk_value)
+    // window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
 }
+
+function deleteComment(ids) {
+    // 发送请求
+    $.ajax({
+        url: "/post/comment/api/delete", // url where to submit the request
+        type: "DELETE", // type of action POST || GET
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        data: JSON.stringify(ids),
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                alert(JSON.stringify(error));
+                return;
+            }
+            // console.log(data);
+
+            $.MsgBox.Alert("消息", "删除成功");
+            getCommentList(postUUID, true, "/post/comment/api/list");
+        }
+    });
+    // window.location = "${ctx }/user/removeUser?ids=" + ids.get();
+}
+
 
 function returnPostList() {
     if (returnpage.trim() == "post") {

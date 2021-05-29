@@ -1,6 +1,7 @@
 package com.luna.post.service;
 
 import com.luna.post.dto.PostDTO;
+import com.luna.post.dto.PostDeatilDTO;
 import com.luna.post.entity.Post;
 import com.github.pagehelper.PageInfo;
 
@@ -18,7 +19,7 @@ public interface PostService {
      * @param id 主键
      * @return 对象
      */
-    Post getById(Long id);
+    PostDTO getById(Long id);
 
     /**
      * 通过实体不为空的属性作为筛选条件查询单个
@@ -26,8 +27,15 @@ public interface PostService {
      * @param post 条件
      * @return 对象
      */
-    Post getByEntity(Post post);
+    PostDTO getByEntity(Post post);
 
+    /**
+     * 查询带用户信息的文章详情
+     * 
+     * @param id
+     * @return
+     */
+    PostDeatilDTO getDetail(Long id);
     /**
      * 通过实体不为空的属性作为筛选条件查询列表
      *
@@ -148,4 +156,5 @@ public interface PostService {
      * @return
      */
     PageInfo<PostDTO> myListPageByEntity(String oneSessionKey, int page, int size, Post post);
+
 }
