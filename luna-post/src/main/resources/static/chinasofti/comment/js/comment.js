@@ -3,6 +3,7 @@ var postPageIndex = 0;
 var postAllPage = 0;
 var postUUID = "";
 var returnpage = ""
+var hostComment
 
 function GetQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -55,7 +56,7 @@ function getPostDetail(postUUID, SynOrAsyn, url) {
                 return;
             }
 
-            // console.log(data);
+            console.log(data);
             if (data == null) {
                 return;
             }
@@ -78,9 +79,9 @@ function getPostDetail(postUUID, SynOrAsyn, url) {
                     '</tbody></table></div></div></div></div></div></div>' +
                     '<div id="postText"><span>' + post.postText + '</span></div>' +
                     '<div id="postAtt"><audio src="' + post.postAudio + '" controls="controls" ' +
-                    'style="height:20px"></audio>&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
-                    'onclick="hotsPraiseClick(\'' + post.id + '\',\'' + post.id + '\')">赞：' +
-                    '</a>' + post.praise + '</div>';
+                    'style="height:20px"></audio>&nbsp;|&nbsp;<a id="praisecNum"  href="javascript:void(0);" ' +
+                    'onclick="hotsPraiseClick(\'' + post.id + '\',\'' + null + '\')">赞：' +
+                    '</a> <span id="postPraise">' + post.praise + '</span></div>';
 
                 $('#post_data').append(content);
             } else {
@@ -121,6 +122,7 @@ function getHost(postUUID, SynOrAsyn, url) {
                 let content = '';
                 $('#comment_hot_data').empty();
 
+                hostComment = data.id;
                 content = content + '<div class="form-inline col-sm-12">' +
                     '<div><img src="' + data.photo + '" style="whith:80px;height:80px"></div>&nbsp;&nbsp;' +
                     '<div>' +
@@ -134,8 +136,8 @@ function getHost(postUUID, SynOrAsyn, url) {
                     '<span>' + data.content + '</span></div><div class="col-sm-12">' +
                     '<audio src="' + data.audio + '" controls="controls" style="height:20px"></audio>' +
                     '&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
-                    'onclick="hotsPraiseClick(\'' + data.postId + '\',\'' + data.id + '\')">' +
-                    '赞：</a>' + data.postPraise + '</div>';
+                    'onclick="hotPraise(\'' + data.postId + '\',\'' + data.id + '\')">' +
+                    '赞：</a> <span id="hotComment' + data.id + '">' + data.postPraise + '</span> </div>';
                 $('#comment_hot_data').append(content);
             } else {
                 $('#comment_hot_data').empty();
@@ -190,8 +192,8 @@ function getCommentList(postUUID, SynOrAsyn, url) {
                         '<span>' + list[i].content + '</span></div><div class="col-sm-12">' +
                         '<audio src="' + list[i].audio + '" controls="controls" style="height:20px"></audio>' +
                         '&nbsp;|&nbsp;<a id="praisecNum" href="javascript:void(0);" ' +
-                        'onclick="hotsPraiseClick(\'' + list[i].postId + '\',\'' + list[i].id + '\')">' +
-                        '赞：</a>' + list[i].postPraise + '</div>';
+                        'onclick="commentPraise(\'' + list[i].postId + '\',\'' + list[i].id + '\')">' +
+                        '赞：</a> <span id="comment' + list[i].id + '">' + list[i].postPraise + '</span></div>';
                 }
                 $('#comment_data').append(content);
             } else {
@@ -222,12 +224,11 @@ function allCommentlist(allCommentlist, admin) {
 
 }
 
-function hotsPraiseClick(postUUID, cmUUID) {
+function hotPraise(postUUID, cmUUID) {
     $.ajax({
         type: "POST",
-        url: "/post/post/api/parise",
+        url: "/post/comment/api/praise/" + postUUID + "/" + cmUUID,
         contentType: 'application/json;charset=UTF-8',
-        data: JSON.stringify(comment),
         dataType: "json",
         success: function (result) {
             console.log(result);
@@ -238,16 +239,70 @@ function hotsPraiseClick(postUUID, cmUUID) {
                 $.MsgBox.Alert("新增失败", result.message);
             }
 
-            if (data) {
-                $.MsgBox.Alert("消息", "新增成功！");
-                window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
+            if (data !== null) {
+                let id = '#' + "hotComment" + data.commentId;
+                $(id).text(data.praise);
+                let comment = '#' + "comment" + data.commentId;
+                $(comment).text(data.praise);
             } else {
-                $.MsgBox.Alert("消息", "新增失败，请重试！");
+                $.MsgBox.Alert("消息", "点赞过快了哟");
             }
         }
     });
-    $.MsgBox.Alert("消息", "您已点过了赞");
+}
 
+function hotsPraiseClick(postUUID, cmUUID) {
+    $.ajax({
+        type: "POST",
+        url: "/post/post/api/praise/" + postUUID,
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+            }
+
+            if (data !== null) {
+                $('#postPraise').text(data);
+            } else {
+                $.MsgBox.Alert("消息", "点赞过快了哟");
+            }
+        }
+    });
+
+}
+
+function commentPraise(postUUID, cmUUID) {
+    $.ajax({
+        type: "POST",
+        url: "/post/comment/api/praise/" + postUUID + "/" + cmUUID,
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("新增失败", result.message);
+            }
+
+            if (data !== null) {
+                let id = '#' + "comment" + data.commentId;
+                $(id).text(data.praise);
+                if (data.commentId === hostComment) {
+                    let id = '#' + "hotComment" + hostComment;
+                    $(id).text(data.praise);
+                }
+            } else {
+                $.MsgBox.Alert("消息", "点赞过快了哟");
+            }
+        }
+    });
 }
 
 function addComCheck() {
@@ -273,7 +328,7 @@ function insertComment(comment) {
         data: JSON.stringify(comment),
         dataType: "json",
         success: function (result) {
-            console.log(result);
+            // console.log(result);
             let data;
             try {
                 data = checkResultAndGetData(result);

@@ -226,6 +226,16 @@ public class PostServiceImpl implements PostService {
         return getPostDTOPageInfo(post);
     }
 
+    @Override
+    public synchronized Integer praise(Long postId) {
+        CommentPraise tempCommentPraise = new CommentPraise(postId);
+        tempCommentPraise.setCommentId(0L);
+        CommentPraise commentPraise = commentPraiseMapper.getByEntity(tempCommentPraise);
+        commentPraise.setPraise(commentPraise.getPraise() + 1);
+        commentPraiseMapper.update(commentPraise);
+        return commentPraise.getPraise();
+    }
+
     private PageInfo<PostDTO> getPostDTOPageInfo(Post post) {
         List<Post> list = postMapper.listByEntity(post);
         PageInfo<PostDTO> pageInfo = new PageInfo(list);

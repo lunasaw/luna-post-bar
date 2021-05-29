@@ -3,6 +3,7 @@ package com.luna.post.service;
 import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.Comment;
 import com.github.pagehelper.PageInfo;
+import com.luna.post.entity.CommentPraise;
 
 import java.util.List;
 
@@ -143,4 +144,5 @@ public interface CommentService {
      */
     int countByEntity(Comment comment);
 
+    CommentPraise praise(Long postId, Long commentId);
 }

@@ -6,6 +6,7 @@ import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.Comment;
+import com.luna.post.entity.CommentPraise;
 import com.luna.post.service.CommentService;
 import com.luna.post.utils.CookieUtils;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,14 @@ public class CommentController {
         @PathVariable(value = "size") int size, Comment comment) {
         PageInfo<Comment> pageInfo = commentService.listPageByEntity(page, size, comment);
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
+    }
+
+    @PostMapping("/praise/{postId}/{commentId}")
+    public ResultDTO<CommentPraise> praise(HttpServletRequest httpServletRequest,
+        @PathVariable(value = "postId") Long postId, @PathVariable(value = "commentId") Long commentId) {
+
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentService.praise(postId, commentId));
     }
 
     @GetMapping("/pageList/{page}/{size}")

@@ -157,4 +157,11 @@ public interface PostService {
      */
     PageInfo<PostDTO> myListPageByEntity(String oneSessionKey, int page, int size, Post post);
 
+    /**
+     * 文章点赞
+     * 
+     * @param postId
+     * @return
+     */
+    Integer praise(Long postId);
 }

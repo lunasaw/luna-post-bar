@@ -1,6 +1,5 @@
 package com.luna.post.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.luna.baidu.api.BaiduVoiceApi;
 import com.luna.baidu.config.BaiduProperties;
 import com.luna.baidu.req.VoiceSynthesisReq;
@@ -19,8 +18,6 @@ import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -105,7 +102,6 @@ public class CommentServiceImpl implements CommentService {
         Optional<CommentPraise> first =
             commentPraises.stream().filter(commentPraise -> commentPraise.getCommentId() != 0)
                 .max(Comparator.comparing(CommentPraise::getPraise));
-        System.out.println(JSON.toJSONString(first.get()));
         if (first.isPresent()) {
             CommentPraise commentPraise = first.get();
             // 这条评论的用户名
@@ -220,6 +216,17 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public int countAll() {
         return commentMapper.countAll();
+    }
+
+    @Override
+    public synchronized CommentPraise praise(Long postId, Long commentId) {
+        CommentPraise tempCommentPraise = new CommentPraise();
+        tempCommentPraise.setCommentId(commentId);
+        tempCommentPraise.setPostId(postId);
+        CommentPraise commentPraise = commentPraiseMapper.getByEntity(tempCommentPraise);
+        commentPraise.setPraise(commentPraise.getPraise() + 1);
+        commentPraiseMapper.update(commentPraise);
+        return commentPraise;
     }
 
     @Override

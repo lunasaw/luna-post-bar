@@ -64,6 +64,14 @@ public class PostController {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
+    @PostMapping("/praise/{postId}")
+    public ResultDTO<Integer> praise(HttpServletRequest httpServletRequest,
+        @PathVariable(value = "postId") Long postId) {
+
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            postService.praise(postId));
+    }
+
     @GetMapping("/pageList/{page}/{size}")
     public ResultDTO<PageInfo<Post>> listPage(@PathVariable(value = "page") int page,
         @PathVariable(value = "size") int size) {
