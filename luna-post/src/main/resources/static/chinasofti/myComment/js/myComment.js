@@ -1,5 +1,5 @@
 var everyPageDataCount = 10;
-var postPageIndex = 0;
+var postPageIndex = 1;
 var postAllPage = 0;
 
 function GetQueryString(name) {
@@ -26,15 +26,93 @@ $(function () {
                 'table', 'hr', 'emoticons',]
         });
 
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", 0, everyPageDataCount);
+    getPostList(true, "/post/comment/api/myPageListByEntity/", 1, everyPageDataCount);
 });
 
 
-function getPostList(SynOrAsyn, url, pageIndex, everyPageDataCount) {
+function getPostList(SynOrAsyn, url, pageStart, pageSize) {
+    let comment = {}
+    console.log(comment)
+    $.ajax({
+        url: url + "/" + pageStart + "/" + pageSize, // url where to submit the request
+        type: "GET", // type of action POST || GET
+        data: comment,
+        sync: SynOrAsyn,
+        success: function (result) {
+            // console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(error));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+
+            console.log(data);
+            if (data == null) {
+                return;
+            }
+
+            // 当前页面开始记录数目
+            $("#data_count_start").text(data.startRow);
+            // 当前页面结束记录数
+            $("#data_count_end").text(data.endRow);
+            // 总页数
+            $("#page_count").text(data.pages);
+            postAllPage = data.pages;
+            // 总计
+            $("#data_count").text(data.total);
+            // 当前页数
+            $("#page_num").text(data.pageNum);
+            if (data.isFirstPage == true) {
+                $("#page_pre_btn").attr("disabled", "disabled")
+            } else {
+                $("#page_pre_btn").removeAttr("disabled");
+            }
+
+            if (data.isLastPage == true) {
+                $("#page_next_btn").attr("disabled", "disabled")
+            } else {
+                $("#page_next_btn").removeAttr("disabled");
+            }
 
 
+            // 渲染页面
+            let list = data.list;
+            if (list.length > 0) {
+                let content = '';
+                $('#myComment').empty();
+                for (let i in list) {
+                    content = content + '<div class="row">' +
+                        '<div class="form-inline col-sm-12">' +
+                        '<span>' + list[i].content + '</span>' +
+                        '</div><div class="col-sm-12">' +
+                        '<audio src="' + list[i].audio + '" controls="controls" style="height:20px">' +
+                        '</audio></div><div class="col-sm-12"><div><table>' +
+                        '<tbody><tr><td>评论时间：' + list[i].modifiedTime + '&nbsp;&nbsp;|&nbsp;&nbsp;</td>' +
+                        '<td>评论文章：<a href="" onclick="post_detailed(\'' + list[i].postId + '\'); ' +
+                        'return false;">' + list[i].postTitle + '</a>&nbsp;&nbsp;|&nbsp;&nbsp;</td><td><a href="" ' +
+                        'onclick="EDIT_COM(\'' + list[i].id + '\'); return false;">评论编辑</a>：&nbsp;&nbsp;|&nbsp;&nbsp;</td>' +
+                        '<td>删除评论：<input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"></td></tr></tbody>' +
+                        '</table></div>' +
+                        '</div></div><hr><hr>';
+                }
+                $('#myComment').append(content);
+            } else {
+                $('#myComment').empty();
+            }
+        }
+    });
 }
 
+function checkResultAndGetData($result) {
+    if ($result.success == false) {
+        throw $result;
+    }
+    return $result.data;
+}
 
 function allCommentlist(allCommentlist, postAllNum, allPage, pageIndex) {
 
@@ -56,7 +134,34 @@ function DELETE_COM() {
         return;
     }
 
+    deletePost(chk_value);
+}
 
+function deletePost(ids) {
+    // 发送请求
+    $.ajax({
+        url: "/post/comment/api/delete", // url where to submit the request
+        type: "DELETE", // type of action POST || GET
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        data: JSON.stringify(ids),
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                alert(JSON.stringify(error));
+                return;
+            }
+            console.log(data);
+
+            $.MsgBox.Alert("消息", "删除成功");
+            getPostList(true, "/post/comment/api/myPageListByEntity/", postPageIndex, everyPageDataCount);
+        }
+    });
+    // window.location = "${ctx }/user/removeUser?ids=" + ids.get();
 }
 
 function returnComList() {
@@ -82,12 +187,14 @@ function EDIT_COM(cmUUID) {
 
 function GOTO_POST_NEXT_PAGE() {
 
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", postPageIndex + 1, everyPageDataCount);
+    postPageIndex = postPageIndex + 1;
+    getPostList(true, "/post/comment/api/myPageListByEntity/", postPageIndex, everyPageDataCount);
 
 }
 
 function GOTO_POST_TAIL_PAGE() {
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", postAllPage - 1, everyPageDataCount);
+
+    getPostList(true, "/post/comment/api/myPageListByEntity/", postAllPage, everyPageDataCount);
 
 }
 
@@ -109,16 +216,19 @@ function GOTO_POST_PAGE() {
         $.MsgBox.Alert("消息", "页码超出上限");
         return;
     }
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", jumpVal - 1, everyPageDataCount);
+
+    getPostList(true, "/post/comment/api/myPageListByEntity/", jumpVal, everyPageDataCount);
 }
 
 
 function GOTO_POST_HOME_PAGE() {
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", 0, everyPageDataCount);
+    getPostList(true, "/post/comment/api/myPageListByEntity/", 1, everyPageDataCount);
 }
 
 function GOTO_POST_PREVIOUS_PAGE() {
-    getPostList(true, "/postbar/myCommentController/selectMyCommentByUserUUID", postPageIndex - 1, everyPageDataCount);
+    console.log(postPageIndex)
+    postPageIndex = postPageIndex - 1;
+    getPostList(true, "/post/comment/api/myPageListByEntity/", postPageIndex, everyPageDataCount);
 
 }
 

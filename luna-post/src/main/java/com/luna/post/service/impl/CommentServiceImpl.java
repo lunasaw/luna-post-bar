@@ -10,6 +10,7 @@ import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.CommentDTO;
+import com.luna.post.dto.ShowUserDTO;
 import com.luna.post.entity.*;
 import com.luna.post.mapper.*;
 import com.luna.post.service.CommentService;
@@ -89,10 +90,34 @@ public class CommentServiceImpl implements CommentService {
             }
             User user = userMapper.getById(Long.valueOf(tempComment.getUserId()));
             Register register = registerMapper.getByEntity(new Register(user.getId()));
+            Post post = postMapper.getById(tempComment.getPostId());
             return DO2DTOUtil.comment2CommentDTO(tempComment, user.getName(), user.getCreateTime(),
-                register.getPhoto(), praise.getPraise());
+                register.getPhoto(), praise.getPraise(), post.getPostTitle());
         }).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public PageInfo<CommentDTO> myListPageByEntity(String sessionKey, int page, int size, Comment comment) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+
+        comment.setUserId(String.valueOf(user.getId()));
+        PageHelper.startPage(page, size);
+        List<Comment> list = commentMapper.listByEntity(comment);
+        PageInfo<CommentDTO> pageInfo = new PageInfo(list);
+        List<CommentDTO> collect = list.stream()
+            .map(commentTemp -> {
+                Post post = postMapper.getById(commentTemp.getPostId());
+                return DO2DTOUtil.comment2CommentDTO(commentTemp, user.getName(), user.getCreateTime(), "", 0,
+                    post.getPostTitle());
+            })
+            .collect(Collectors.toList());
+        pageInfo.setList(collect);
+        return pageInfo;
     }
 
     @Override
@@ -108,8 +133,9 @@ public class CommentServiceImpl implements CommentService {
             User user = userMapper.getById(commentPraise.getUserId());
             Register register = registerMapper.getByEntity(new Register(user.getId()));
             Comment tempComment = commentMapper.getById(commentPraise.getCommentId());
+            Post post = postMapper.getById(tempComment.getPostId());
             return DO2DTOUtil.comment2CommentDTO(tempComment, user.getName(), user.getCreateTime(),
-                register.getPhoto(), commentPraise.getPraise());
+                register.getPhoto(), commentPraise.getPraise(), post.getPostTitle());
         }
         return null;
     }

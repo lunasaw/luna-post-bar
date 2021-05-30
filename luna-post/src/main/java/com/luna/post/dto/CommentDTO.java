@@ -47,6 +47,11 @@ public class CommentDTO implements Serializable {
      * 评论音频
      */
     private String            audio;
+
+    /**
+     * 文章标题
+     */
+    private String            postTitle;
     /**
      * 创建时间
      */
@@ -141,6 +146,14 @@ public class CommentDTO implements Serializable {
 
     public void setAudio(String audio) {
         this.audio = audio;
+    }
+
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
     }
 
     public String getCreateTime() {

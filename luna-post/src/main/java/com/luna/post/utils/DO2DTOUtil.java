@@ -77,13 +77,14 @@ public class DO2DTOUtil {
     }
 
     public static CommentDTO comment2CommentDTO(Comment comment, String username, Date userTime, String photo,
-        Integer praise) {
+        Integer praise, String postTitle) {
         if (comment == null) {
             return null;
         }
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setPostPraise(praise);
         commentDTO.setUsername(username);
+        commentDTO.setPostTitle(postTitle);
         commentDTO.setUserTime(userTime != null
             ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, userTime) : "");
         commentDTO.setPhoto(photo);

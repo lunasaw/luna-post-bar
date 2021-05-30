@@ -55,6 +55,15 @@ public class CommentController {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
+    @GetMapping("/myPageListByEntity/{page}/{size}")
+    public ResultDTO<PageInfo<CommentDTO>> myPageListByEntity(HttpServletRequest httpServletRequest,
+        @PathVariable(value = "page") int page,
+        @PathVariable(value = "size") int size, Comment comment) {
+        PageInfo<CommentDTO> pageInfo =
+            commentService.myListPageByEntity(CookieUtils.getOneSessionKey(httpServletRequest), page, size, comment);
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
+    }
+
     @PostMapping("/praise/{postId}/{commentId}")
     public ResultDTO<CommentPraise> praise(HttpServletRequest httpServletRequest,
         @PathVariable(value = "postId") Long postId, @PathVariable(value = "commentId") Long commentId) {

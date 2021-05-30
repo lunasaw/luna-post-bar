@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="static/comp/fontawesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="static/comp/ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="static/comp/adminlte/css/adminlte.css">
-	<link rel="stylesheet" href="static/css/default/mask.css" />
+	<link rel="stylesheet" href="static/css/default/mask.css"/>
 </head>
 
 <body style="height: auto;">
@@ -32,9 +32,9 @@
 										<label for="SEARCH_ORG_NAME" class="col-md-4">用户名：</label>
 										<div class="col-md-8">
 											<input type="hidden" id="SEARCH_POST_NAME_HIDDEN"
-												name="SEARCH_POST_NAME_HIDDEN" value="">
+											       name="SEARCH_POST_NAME_HIDDEN" value="">
 											<input type="text" id="SEARCH_POST_NAME" name="SEARCH_POST_NAME" size="45"
-												value="" class="form-control" placeholder="请输入用户名">
+											       value="" class="form-control" placeholder="请输入用户名">
 										</div>
 									</div>
 								</div>
@@ -53,8 +53,11 @@
 				<div class="card">
 					<div class="card-header" style="width:100%">
 						<h3 class="card-title col-md-3">当前：<span id="LABLE_FATHER_ORG_NAME">用户管理</span></h3>
-						<div class="col-md-2 col-md-offset-7" id="postAddAndDeleteDiv"><button
-								class="btn  btn-danger btn-sm" type="button" onclick="DELETE_POST()">删除</button></div>
+						<div class="col-md-2 col-md-offset-7" id="postAddAndDeleteDiv">
+							<button
+								class="btn  btn-danger btn-sm" type="button" onclick="DELETE_POST()">删除
+							</button>
+						</div>
 					</div>
 					<div class="card-body">
 						<div id="example2_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
@@ -71,19 +74,26 @@
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
 												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													用户名</th>
+													用户名
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													邮箱</th>
+													邮箱
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													年龄</th>
+													年龄
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													性别</th>
+													性别
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													注册时间</th>
+													注册时间
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													最后登录时间</th>
+													最后登录时间
+												</th>
 												<th style="text-align:center;" class="sorting" rowspan="1" colspan="1">
-													权限</th>
+													权限
+												</th>
 											</tr>
 										</thead>
 										<tbody id="POST_LIST_TBODY_ID" class="user_data">
@@ -99,21 +109,38 @@
 								<div class="col-sm-12 col-md-9 col-md-offset-3">
 									<div class="dataTables_paginate paging_simple_numbers">
 										<ul class="pagination" id="PAGE_ID">
-											<li style="margin-left: 30px"> <button class="btn btn-primary" type="button"
-													onclick="GOTO_POST_HOME_PAGE('0')">首页</button></li>
-											<li style="margin-left: 30px" > <button class="btn btn-primary" id="page_pre_btn" type="button"
-													onclick="GOTO_POST_PREVIOUS_PAGE('0')">前一页</button></li>
-											<li style="margin-left: 30px"> <button class="btn btn-primary" id="page_next_btn" type="button"
-													onclick="GOTO_POST_NEXT_PAGE('2')">后一页</button></li>
-											<li style="margin-left: 30px"> <button class="btn btn-primary" type="button"
-													onclick="GOTO_POST_TAIL_PAGE('2')">末页</button></li>
-											<li style="margin-left: 30px"> <input id="JUMP_INPUT_ID" type="text"
-													style="display:inline;width:80px" size="6"> <button
+											<li style="margin-left: 30px">
+												<button class="btn btn-primary" type="button"
+												        onclick="GOTO_POST_HOME_PAGE('0')">首页
+												</button>
+											</li>
+											<li style="margin-left: 30px">
+												<button class="btn btn-primary" id="page_pre_btn" type="button"
+												        onclick="GOTO_POST_PREVIOUS_PAGE('0')">前一页
+												</button>
+											</li>
+											<li style="margin-left: 30px">
+												<button class="btn btn-primary" id="page_next_btn" type="button"
+												        onclick="GOTO_POST_NEXT_PAGE('2')">后一页
+												</button>
+											</li>
+											<li style="margin-left: 30px">
+												<button class="btn btn-primary" type="button"
+												        onclick="GOTO_POST_TAIL_PAGE('2')">末页
+												</button>
+											</li>
+											<li style="margin-left: 30px"><input id="JUMP_INPUT_ID" type="text"
+											                                     style="display:inline;width:80px"
+											                                     size="6">
+												<button
 													class="btn btn-sm btn-outline-primary"
-													onclick="GOTO_POST_PAGE();return false;">跳转</button></li>
+													onclick="GOTO_POST_PAGE();return false;">跳转
+												</button>
+											</li>
 											<li style="margin-left: 30px">
 												<div class="dataTables_info" style="margin-top: 6px;margin-left: 100px">
-													<span><span id="page_num">2</span>/ <span id="page_count">3</span>    页</span> <span>共 <span id="data_count">15</span> 条</span></div>
+													<span><span id="page_num">2</span>/ <span id="page_count">3</span>    页</span>
+													<span>共 <span id="data_count">15</span> 条</span></div>
 											</li>
 										</ul>
 									</div>
@@ -129,7 +156,6 @@
 	</div>
 
 
-
 	<!--<div id="ORG_ADD_DIV_ID" class="card card-info" style="display:none">  -->
 	<div id="POST_ADD_DIV_ID" class="card card-info" style="display:none">
 		<div class="card-header">
@@ -143,14 +169,14 @@
 					<label for="JI_JOB_NAME" class="col-sm-2 control-label">用户名：</label>
 					<div class="col-sm-10">
 						<input value="" type="text" name="userName" id="userName" class="form-control"
-							style="width:900px" maxlength="16" placeholder="请输入用户名">
+						       style="width:900px" maxlength="16" placeholder="请输入用户名">
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="JI_JOB_NAME" class="col-sm-2 control-label">密码：</label>
 					<div class="col-sm-10">
 						<input id="password" name="password" value="" class="form-control" style="width:900px"
-							type="password" maxlength="6" placeholder="请输入密码(可选，不填写将保持原有密码)">
+						       type="password" maxlength="6" placeholder="请输入密码(可选，不填写将保持原有密码)">
 					</div>
 				</div>
 				<div class="form-group">
@@ -175,7 +201,7 @@
 					<label for="JI_JOB_NAME" class="col-sm-2 control-label">邮箱：</label>
 					<div class="col-sm-10">
 						<input id="regEmial" name="regEmial" value="" class="form-control" style="width:900px"
-							type="text" placeholder="请输入邮箱地址">
+						       type="text" placeholder="请输入邮箱地址">
 					</div>
 				</div>
 
@@ -194,16 +220,13 @@
 					<button type="button" class="btn btn-default" onclick="returnPostList()">返回</button>
 				</div>
 				<div class="card-footer col-md-3 col-md-offset-4" id="tishi"
-					style="text-align: center;color: red;font-size: 15px">
+				     style="text-align: center;color: red;font-size: 15px">
 				</div>
 				<!-- /.card-footer -->
 			</div>
 
 		</div>
 	</div>
-
-
-
 
 
 	<script src="static/comp/jquery/dist/jquery.js"></script>

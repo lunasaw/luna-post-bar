@@ -33,7 +33,6 @@ $(function () {
 
     getCommentList(postUUID, true, "/post/comment/api/list");
 
-
     getHost(postUUID, true, "/post/comment/api/getHot");
 
     getPostDetail(postUUID, true, "/post/post/api/getDetail");

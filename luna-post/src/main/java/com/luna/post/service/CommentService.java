@@ -38,6 +38,17 @@ public interface CommentService {
     List<CommentDTO> listByEntity(Comment comment);
 
     /**
+     * 查询本人评论列表
+     * 
+     * @param oneSessionKey
+     * @param page
+     * @param size
+     * @param comment
+     * @return
+     */
+    PageInfo<CommentDTO> myListPageByEntity(String oneSessionKey, int page, int size, Comment comment);
+
+    /**
      * 获取热点评论
      *
      * @return
@@ -145,4 +156,5 @@ public interface CommentService {
     int countByEntity(Comment comment);
 
     CommentPraise praise(Long postId, Long commentId);
+
 }
