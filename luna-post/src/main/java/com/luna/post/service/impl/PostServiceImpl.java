@@ -99,7 +99,8 @@ public class PostServiceImpl implements PostService {
             commentPraiseMapper.insert(commentPraise);
         }
         return DO2DTOUtil.postDO2PostDTO(postTemp, user.getName(),
-            first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime(), commentPraise.getPraise());
+            first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime(), commentPraise.getPraise(),
+            comments.size());
     }
 
     @Override
@@ -202,6 +203,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public int deleteByIds(List<Long> list) {
+        list.forEach(i -> {
+            Post post = postMapper.getById(i);
+            CommentPraise commentPraise = new CommentPraise();
+            // post 的赞，对应的评论应为0
+            commentPraise.setPostId(post.getId());
+            commentPraise.setCommentId(0L);
+            commentPraiseMapper.deleteByEntity(commentPraise);
+        });
         return postMapper.deleteByIds(list);
     }
 
@@ -234,6 +243,13 @@ public class PostServiceImpl implements PostService {
         commentPraise.setPraise(commentPraise.getPraise() + 1);
         commentPraiseMapper.update(commentPraise);
         return commentPraise.getPraise();
+    }
+
+    @Override
+    public synchronized Boolean read(Long postId) {
+        Post post = postMapper.getById(postId);
+        post.setPostPageViews(post.getPostPageViews() + 1);
+        return postMapper.update(post) == 1;
     }
 
     private PageInfo<PostDTO> getPostDTOPageInfo(Post post) {

@@ -64,6 +64,12 @@ public class PostController {
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, pageInfo);
     }
 
+    @PostMapping("/read/{postId}")
+    public ResultDTO<Boolean> read(@PathVariable(value = "postId") Long postId) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            postService.read(postId));
+    }
+
     @PostMapping("/praise/{postId}")
     public ResultDTO<Integer> praise(HttpServletRequest httpServletRequest,
         @PathVariable(value = "postId") Long postId) {

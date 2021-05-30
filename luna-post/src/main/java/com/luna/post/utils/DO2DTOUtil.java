@@ -37,7 +37,8 @@ public class DO2DTOUtil {
         return showUserDTO;
     }
 
-    public static PostDTO postDO2PostDTO(Post post, String username, Date lastComment, Integer praise) {
+    public static PostDTO postDO2PostDTO(Post post, String username, Date lastComment, Integer praise,
+        Integer commentSize) {
         if (post == null) {
             return null;
         }
@@ -47,7 +48,7 @@ public class DO2DTOUtil {
         postDTO.setPraise(praise != null ? praise : 0);
         postDTO.setLastComment(
             lastComment != null ? DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD_HH_MM_SS, post.getCreateTime()) : "");
-        postDTO.setPostCommentSize(Math.toIntExact(post.getPostPageViews() != null ? post.getPostPageViews() : 0));
+        postDTO.setPostCommentSize(commentSize);
         postDTO.setId(post.getId());
         postDTO.setUserId(post.getUserId());
         postDTO.setPostTitle(post.getPostTitle());

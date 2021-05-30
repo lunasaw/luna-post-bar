@@ -77,7 +77,7 @@ function getUserList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
                     content = content + '<tr bgcolor="#FFFFFF">' +
                         '<td align="center" width="20"> ' +
                         '<input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"> </td><td valign="center" align="center" width="30">' +
-                        ' <a href="" onclick="EDIT_USER(\'' + list[i].id + '\',\'' + list[i].name + '\',\'' + (list[i].sex == "男" ? 0 : 1) + '\',\'' + list[i].age + ' \',\'' + list[i].email + '\',\'' + (list[i].admin == "管理员" ? 0 : 1) + '\'); return false;">' +
+                        ' <a href="" onclick="EDIT_USER(\'' + list[i].id + '\',\'' + list[i].name + '\',\'' + (list[i].sex === '男' ? 1 : 0) + '\',\'' + list[i].age + ' \',\'' + list[i].email + '\',\'' + (list[i].admin == "管理员" ? 0 : 1) + '\'); return false;">' +
                         '' + list[i].name + '</a></td>' +
                         '<td valign="center" align="center" width="110">' + list[i].email + '</td>' +
                         '<td valign="center" align="center" width="30">' + list[i].age + ' </td>' +
@@ -212,7 +212,7 @@ function editUserCheck() {
     var oldName = $("#oldUserName").val();
 
     let userInfo = {
-        id : userUUID,
+        id: userUUID,
         name: userName,
         sex: regsex,
         age: regAge,
@@ -252,7 +252,7 @@ function editUserCheck() {
     update(userInfo);
 }
 
-function update(userInfo){
+function update(userInfo) {
     $.ajax({
         type: "PUT",
         url: "/post/user/api/userManage/update",

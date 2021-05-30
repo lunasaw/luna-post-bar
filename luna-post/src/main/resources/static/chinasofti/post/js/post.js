@@ -114,7 +114,7 @@ function getPostList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
                 return;
             }
 
-            // console.log(data);
+            console.log(data);
             if (data == null) {
                 return;
             }
@@ -233,9 +233,29 @@ function searchByPostName() {
     getPostList(searchNameVal, 0, everyPageDataCount, true, "/post/post/api/pageListByEntity");
 }
 
-// 详情
+// 详情触发阅读函数
 function post_detailed(postUUID) {
+    readPost(postUUID);
     window.location.replace("comment.html?page=post&postid=" + postUUID);
+}
+
+function readPost(postId) {
+    // 发送请求
+    $.ajax({
+        url: "/post/post/api/read/" + postId, // url where to submit the request
+        type: "POST", // type of action POST || GET
+        contentType: 'application/json;charset=UTF-8',
+        dataType: "json",
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                $.MsgBox.Alert("消息", "系统错误，请联系管理员");
+            }
+        }
+    });
 }
 
 function DELETE_POST() {

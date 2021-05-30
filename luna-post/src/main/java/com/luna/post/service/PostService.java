@@ -36,6 +36,7 @@ public interface PostService {
      * @return
      */
     PostDeatilDTO getDetail(Long id);
+
     /**
      * 通过实体不为空的属性作为筛选条件查询列表
      *
@@ -164,4 +165,12 @@ public interface PostService {
      * @return
      */
     Integer praise(Long postId);
+
+    /**
+     * 文章阅读
+     * 
+     * @param postId
+     * @return
+     */
+    Boolean read(Long postId);
 }

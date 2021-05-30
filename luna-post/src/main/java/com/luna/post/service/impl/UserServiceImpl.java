@@ -1,7 +1,10 @@
 package com.luna.post.service.impl;
+
 import java.util.Date;
 
 import com.luna.common.encrypt.HashTools;
+import com.luna.post.entity.Comment;
+import com.luna.post.entity.CommentPraise;
 import com.luna.post.entity.Register;
 import com.luna.post.mapper.RegisterMapper;
 import com.luna.post.mapper.UserMapper;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -21,10 +25,10 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserMapper userMapper;
+    @Resource
+    private UserMapper     userMapper;
 
-    @Autowired
+    @Resource
     private RegisterMapper registerMapper;
 
     @Override
@@ -93,6 +97,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int deleteByIds(List<Long> list) {
+
+        list.forEach(i -> {
+            User user = userMapper.getById(i);
+            registerMapper.deleteByEntity(new Register(user.getId()));
+        });
+
         return userMapper.deleteByIds(list);
     }
 
@@ -107,4 +117,3 @@ public class UserServiceImpl implements UserService {
     }
 
 }
-
