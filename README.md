@@ -1,6 +1,6 @@
 # luna-post
 
-luna-post
+luna-post 语音论坛
 
 # Contributor
 
