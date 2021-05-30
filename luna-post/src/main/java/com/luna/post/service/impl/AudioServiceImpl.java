@@ -12,7 +12,6 @@ import com.luna.post.service.AudioService;
 import com.luna.post.entity.Audio;
 
 import com.luna.redis.util.RedisHashUtil;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
@@ -28,13 +27,13 @@ import java.util.List;
 @Service
 public class AudioServiceImpl implements AudioService {
 
-    @Autowired
+    @Resource
     private AudioMapper   audioMapper;
 
     @Resource
     private UserMapper    userMapper;
 
-    @Autowired
+    @Resource
     private RedisHashUtil redisHashUtil;
 
     @Override

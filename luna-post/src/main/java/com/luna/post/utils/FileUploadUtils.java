@@ -17,7 +17,7 @@ import com.luna.common.text.RandomStrUtil;
 /**
  * 文件上传工具类
  * 
- * @author ruoyi
+ * @author luna
  */
 public class FileUploadUtils {
     /**
