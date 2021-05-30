@@ -1,6 +1,5 @@
 package com.luna.post.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.luna.common.dto.ResultDTO;
 import com.luna.common.dto.constant.ResultCode;
@@ -92,8 +91,9 @@ public class CommentController {
     }
 
     @PutMapping("/update")
-    public ResultDTO<Boolean> update(@RequestBody Comment comment) {
-        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, commentService.update(comment) == 1);
+    public ResultDTO<Boolean> update(HttpServletRequest httpServletRequest, @RequestBody Comment comment) {
+        return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS,
+            commentService.update(CookieUtils.getOneSessionKey(httpServletRequest), comment) == 1);
     }
 
     @PutMapping("/updateBatch")

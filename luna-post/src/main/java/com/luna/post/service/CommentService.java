@@ -103,10 +103,12 @@ public interface CommentService {
     /**
      * 更新
      *
+     *
+     * @param oneSessionKey
      * @param comment 对象
      * @return 影响行数
      */
-    int update(Comment comment);
+    int update(String oneSessionKey, Comment comment);
 
     /**
      * 列表更新

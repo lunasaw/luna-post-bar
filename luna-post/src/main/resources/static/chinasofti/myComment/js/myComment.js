@@ -241,7 +241,55 @@ function editComCheck(cmUUID) {
     }
 
 
+    editComment(cmUUID);
+
     window.location.replace("myComment.html?radm=" + Math.random());
+}
 
+function editComment(commentId) {
+    let comment = {
+        commentId: commentId
+    }
+    $.ajax({
+        type: "PUT",
+        url: "/post/comment/api/update",
+        async: true,
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(userInfo),
+        dataType: "json",
+        error: function (XMLHttpRequest, textStatus, text) {
+            $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+        },
+        success: function (result) {
+            console.log(result);
+            let data;
+            try {
+                data = checkResultAndGetData(result);
+            } catch (error) {
+                console.log(error)
+                // alert(JSON.stringify(error));
+                $.MsgBox.Alert("消息", "出错了，请于管理员联系");
+                return;
+            }
+            if (data) {
+                $.MsgBox.Alert("消息", "修改成功");
+                $("#userUUID").val("");
+                $("#userName").val("");
+                $("#regsex").val("");
+                $("#regAge").val("");
+                $("#regEmial").val("");
+                $("#admin").val("");
+                $("#password").val("");
+                $("#oldUserName").val("");
+                $("#tishi").html("");
+                $("#POST_LIST_DIV_ID").attr("style", "display:block;");//隐藏div
+                $("#POST_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
+                var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+                getUserList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
 
+            } else {
+                $.MsgBox.Alert("消息", "修改失败");
+            }
+        }
+    });
 }

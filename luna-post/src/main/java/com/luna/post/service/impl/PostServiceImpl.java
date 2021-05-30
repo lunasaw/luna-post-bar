@@ -203,14 +203,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public int deleteByIds(List<Long> list) {
-        list.forEach(i -> {
+        for (Long i : list) {
             Post post = postMapper.getById(i);
             CommentPraise commentPraise = new CommentPraise();
             // post 的赞，对应的评论应为0
             commentPraise.setPostId(post.getId());
             commentPraise.setCommentId(0L);
             commentPraiseMapper.deleteByEntity(commentPraise);
-        });
+        }
         return postMapper.deleteByIds(list);
     }
 
@@ -255,7 +255,7 @@ public class PostServiceImpl implements PostService {
     private PageInfo<PostDTO> getPostDTOPageInfo(Post post) {
         List<Post> list = postMapper.listByEntity(post);
         PageInfo<PostDTO> pageInfo = new PageInfo(list);
-        List<PostDTO> collect = list.stream().map(postTemp -> getByEntity(postTemp)).collect(Collectors.toList());
+        List<PostDTO> collect = list.stream().map(this::getByEntity).collect(Collectors.toList());
         pageInfo.setList(collect);
         return pageInfo;
     }
