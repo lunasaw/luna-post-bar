@@ -94,7 +94,7 @@ function getPostList(SynOrAsyn, url, pageStart, pageSize) {
                         '<tbody><tr><td>评论时间：' + list[i].modifiedTime + '&nbsp;&nbsp;|&nbsp;&nbsp;</td>' +
                         '<td>评论文章：<a href="" onclick="post_detailed(\'' + list[i].postId + '\'); ' +
                         'return false;">' + list[i].postTitle + '</a>&nbsp;&nbsp;|&nbsp;&nbsp;</td><td><a href="" ' +
-                        'onclick="EDIT_COM(\'' + list[i].id + '\'); return false;">评论编辑</a>：&nbsp;&nbsp;|&nbsp;&nbsp;</td>' +
+                        'onclick="EDIT_COM(\'' + list[i].id + '\',\'' + list[i].content + '\'); return false;">评论编辑</a>：&nbsp;&nbsp;|&nbsp;&nbsp;</td>' +
                         '<td>删除评论：<input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"></td></tr></tbody>' +
                         '</table></div>' +
                         '</div></div><hr><hr>';
@@ -171,9 +171,9 @@ function returnComList() {
     $("#COM_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
 }
 
-function EDIT_COM(cmUUID) {
+function EDIT_COM(cmUUID, cmText) {
 
-    editor.html("测试评论1");
+    editor.html(cmText);
     var html = "";
     html += '<button type="button" class="btn btn-info" onclick="editComCheck(\'' + cmUUID + '\')">编辑</button>';
     html += '<button type="button" class="btn btn-default" onclick="returnComList()">返回</button>';
@@ -226,7 +226,6 @@ function GOTO_POST_HOME_PAGE() {
 }
 
 function GOTO_POST_PREVIOUS_PAGE() {
-    console.log(postPageIndex)
     postPageIndex = postPageIndex - 1;
     getPostList(true, "/post/comment/api/myPageListByEntity/", postPageIndex, everyPageDataCount);
 
@@ -240,22 +239,20 @@ function editComCheck(cmUUID) {
         return;
     }
 
-
-    editComment(cmUUID);
-
-    window.location.replace("myComment.html?radm=" + Math.random());
+    editComment(cmUUID, cmText);
 }
 
-function editComment(commentId) {
+function editComment(commentId, cmText) {
     let comment = {
-        commentId: commentId
+        id: commentId,
+        content: cmText
     }
     $.ajax({
         type: "PUT",
         url: "/post/comment/api/update",
         async: true,
         contentType: 'application/json;charset=UTF-8',
-        data: JSON.stringify(userInfo),
+        data: JSON.stringify(comment),
         dataType: "json",
         error: function (XMLHttpRequest, textStatus, text) {
             $.MsgBox.Alert("消息", "出错了，请于管理员联系");
@@ -272,21 +269,8 @@ function editComment(commentId) {
                 return;
             }
             if (data) {
-                $.MsgBox.Alert("消息", "修改成功");
-                $("#userUUID").val("");
-                $("#userName").val("");
-                $("#regsex").val("");
-                $("#regAge").val("");
-                $("#regEmial").val("");
-                $("#admin").val("");
-                $("#password").val("");
-                $("#oldUserName").val("");
-                $("#tishi").html("");
-                $("#POST_LIST_DIV_ID").attr("style", "display:block;");//隐藏div
-                $("#POST_ADD_DIV_ID").attr("style", "display:none;");//隐藏div
-                var searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-                getUserList(searchNameVal, 0, everyPageDataCount, true, "/post/user/api/showUserPageList");
-
+                returnComList();
+                getPostList(true, "/post/comment/api/myPageListByEntity/", postPageIndex, everyPageDataCount);
             } else {
                 $.MsgBox.Alert("消息", "修改失败");
             }
