@@ -10,6 +10,7 @@ import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.FileTools;
 import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.Html2Text;
 import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.PostDTO;
@@ -147,7 +148,7 @@ public class PostServiceImpl implements PostService {
         post.setUserId(user.getId());
         post.setPostPageViews(0L);
         Audio audio = audioService.getAudio(user.getId());
-        String path = audioService.changeVoice(audio, post.getPostText());
+        String path = audioService.changeVoice(audio, Html2Text.getContent(post.getPostText()));
         post.setPostAudio(userManager.getPath() + "/" + path);
         return postMapper.insert(post);
     }

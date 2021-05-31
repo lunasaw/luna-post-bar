@@ -54,6 +54,7 @@ public class AudioServiceImpl implements AudioService {
         String path = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
             + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
         try {
+            FileTools.createDirectory(path);
             FileTools.write(BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq), path);
         } catch (IOException e) {
             throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, "音频解码错误");

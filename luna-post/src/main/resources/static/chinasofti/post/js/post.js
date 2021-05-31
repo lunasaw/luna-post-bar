@@ -60,9 +60,6 @@ function addPostCheck() {
         postText: text
     }
     insertPost(tempPost);
-    returnPostList();
-    let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
-    getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/pageListByEntity");
 
 
 }
@@ -85,7 +82,10 @@ function insertPost(post) {
 
             if (data) {
                 $.MsgBox.Alert("消息", "新增成功！");
-                window.location.replace("post.html");
+                returnPostList();
+                let searchNameVal = $("#SEARCH_POST_NAME").val().trim();
+                getPostList(searchNameVal, postPageIndex, everyPageDataCount, true, "/post/post/api/pageListByEntity");
+
             } else {
                 $.MsgBox.Alert("消息", "新增失败，请重试！");
             }

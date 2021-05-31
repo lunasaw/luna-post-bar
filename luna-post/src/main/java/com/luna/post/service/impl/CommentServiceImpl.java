@@ -9,6 +9,7 @@ import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
 import com.luna.common.file.FileTools;
 import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.Html2Text;
 import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.CommentDTO;
@@ -61,6 +62,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Resource
     private UserTools           userTools;
+
+    @Resource
+    private UserManager         userManager;
 
     @Override
     public Comment getById(Long id) {
@@ -159,8 +163,9 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setUserId(String.valueOf(user.getId()));
         Audio audio = audioService.getAudio(user.getId());
-        String path = audioService.changeVoice(audio, comment.getContent());
-        comment.setAudio(path);
+        String path = audioService.changeVoice(audio, Html2Text.getContent(comment.getContent()));
+
+        comment.setAudio(userManager.getPath() + "/" + path);
         commentMapper.insert(comment);
         return commentPraiseMapper.insert(new CommentPraise(0, comment.getPostId(), user.getId(), comment.getId()));
     }
@@ -180,7 +185,7 @@ public class CommentServiceImpl implements CommentService {
 
         commentTemp.setContent(comment.getContent());
         Audio audio = audioService.getAudio(user.getId());
-        String path = audioService.changeVoice(audio, comment.getContent());
+        String path = audioService.changeVoice(audio, Html2Text.getContent(comment.getContent()));
         commentTemp.setAudio(path);
         return commentMapper.update(commentTemp);
     }
@@ -212,6 +217,7 @@ public class CommentServiceImpl implements CommentService {
             }
             CommentPraise commentPraise = new CommentPraise();
             commentPraise.setCommentId(comment.getId());
+            commentPraise = commentPraiseMapper.getByEntity(commentPraise);
             commentPraiseMapper.deleteByEntity(commentPraise);
         }
 

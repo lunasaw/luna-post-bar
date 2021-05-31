@@ -33,7 +33,7 @@ $(function () {
 
     getCommentList(postUUID, true, "/post/comment/api/list");
 
-    getHost(postUUID, true, "/post/comment/api/getHot");
+    getHot(postUUID, true, "/post/comment/api/getHot");
 
     getPostDetail(postUUID, true, "/post/post/api/getDetail");
 });
@@ -90,7 +90,7 @@ function getPostDetail(postUUID, SynOrAsyn, url) {
     });
 }
 
-function getHost(postUUID, SynOrAsyn, url) {
+function getHot(postUUID, SynOrAsyn, url) {
     let comment = {
         postId: postUUID
     }
@@ -112,15 +112,13 @@ function getHost(postUUID, SynOrAsyn, url) {
                 return;
             }
 
-            // console.log(data);
-            if (data == null) {
-                return;
-            }
+            console.log(data);
             // 渲染页面
-            if (data !== null) {
-                let content = '';
-                $('#comment_hot_data').empty();
 
+            if (data !== null) {
+
+                $('#comment_hot_data').empty();
+                let content = '';
                 hostComment = data.id;
                 content = content + '<div class="form-inline col-sm-12">' +
                     '<div><img src="' + data.photo + '" style="whith:80px;height:80px"></div>&nbsp;&nbsp;' +
@@ -337,7 +335,8 @@ function insertComment(comment) {
 
             if (data) {
                 $.MsgBox.Alert("消息", "新增成功！");
-                window.location.replace("comment.html?page=" + returnpage + "&postid=" + postUUID);
+                returnComList();
+                getCommentList(postUUID, true, "/post/comment/api/list");
             } else {
                 $.MsgBox.Alert("消息", "新增失败，请重试！");
             }
@@ -400,6 +399,13 @@ function deleteComment(ids) {
 
             $.MsgBox.Alert("消息", "删除成功");
             getCommentList(postUUID, true, "/post/comment/api/list");
+            getHot(postUUID, true, "/post/comment/api/getHot");
+            for (let id in ids) {
+                if (id === hostComment) {
+
+                    console.log("hfjewhrkhewr")
+                }
+            }
         }
     });
     // window.location = "${ctx }/user/removeUser?ids=" + ids.get();

@@ -19,7 +19,7 @@ public interface AudioService {
      * @param text 文字
      * @return
      */
-    public String changeVoice(Audio audio, String text);
+    String changeVoice(Audio audio, String text);
 
     /**
      * 用户编号查询声音配置
