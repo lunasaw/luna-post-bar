@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luna.post.mapper.PostPraiseMapper">
+
+    <resultMap type="com.luna.post.entity.PostPraise" id="PostPraiseResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="postId" column="post_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="modifiedTime" column="modified_time" jdbcType="TIMESTAMP"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="table_field">
+      id, post_id, user_id, create_time, modified_time, version      
+    </sql>
+
+    <!--通过Id查询单个-->
+    <select id="getById" resultMap="PostPraiseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="table_field"/>
+        from tb_post_praise
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <!--通过实体不为空的属性作为筛选条件查询列表-->
+    <select id="listByEntity" resultMap="PostPraiseResultMap" parameterType="com.luna.post.entity.PostPraise">
+        select
+        <include refid="table_field"/>
+        from tb_post_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过实体不为空的属性作为筛选条件查询单个-->
+    <select id="getByEntity" resultMap="PostPraiseResultMap" parameterType="com.luna.post.entity.PostPraise">
+        select
+        <include refid="table_field"/>
+        from tb_post_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <!--通过Id列表作为筛选条件查询列表，列表长度不为0-->
+    <select id="listByIds" resultMap="PostPraiseResultMap" parameterType="list">
+        select
+        <include refid="table_field"/>
+        from tb_post_praise
+        where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--新增实体属性不为null的列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.luna.post.entity.PostPraise">
+        insert into tb_post_praise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postId != null  ">
+                post_id,
+            </if>
+            <if test="userId != null  ">
+                user_id,
+            </if>
+            create_time,
+            modified_time,
+            version,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postId != null  ">
+                #{postId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null  ">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            now(),
+            now(),
+            0,
+        </trim>
+    </insert>
+
+    <!--批量新增所有列，列表长度不能为0，且列表id统一为null或者统一不为null-->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true" parameterType="list">
+        insert into tb_post_praise
+        (
+        post_id
+        ,
+        user_id
+        ,
+        create_time
+        ,
+        modified_time
+        ,
+        version
+        )
+        values
+        <foreach item="item" collection="list" separator="," open="" close="" index="index">
+            ( #{item.postId,jdbcType=INTEGER}
+            ,
+            #{item.userId,jdbcType=INTEGER}
+            ,
+            now() ,
+            now() ,
+            0 ,
+            )
+        </foreach>
+    </insert>
+
+    <!--通过主键修改实体属性不为null的列-->
+    <update id="update" parameterType="com.luna.post.entity.PostPraise">
+        update tb_post_praise
+        <set>
+            <if test="postId != null  ">
+                post_id = #{postId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null  ">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            modified_time = now(),
+            version = version + 1,
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+        and version = #{version,jdbcType=OTHER}
+    </update>
+
+    <!--通过表字段修改实体属性不为null的列-->
+    <update id="updateByField">
+        update tb_post_praise
+        <set>
+
+            <if test="where.postId == null and set.postId != null">
+                post_id = #{set.postId,jdbcType=INTEGER},
+            </if>
+
+            <if test="where.userId == null and set.userId != null">
+                user_id = #{set.userId,jdbcType=INTEGER},
+            </if>
+
+
+            modified_time = now(),
+
+            version = version + 1,
+        </set>
+        <where>
+            <if test="where.id != null and id != ''">
+                and id = #{where.id,jdbcType=INTEGER}
+            </if>
+            <if test="where.postId != null and postId != ''">
+                and post_id = #{where.postId,jdbcType=INTEGER}
+            </if>
+            <if test="where.userId != null and userId != ''">
+                and user_id = #{where.userId,jdbcType=INTEGER}
+            </if>
+            <if test="where.createTime != null and createTime != ''">
+                and create_time = #{where.createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="where.modifiedTime != null and modifiedTime != ''">
+                and modified_time = #{where.modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            and version = #{version,jdbcType=OTHER}
+        </where>
+    </update>
+
+    <!--通过主键修改实体列表，列表长度不能为0，注意：当实体属性为null时，对应的列也会别更新为null-->
+    <update id="updateBatch" parameterType="list">
+        update tb_post_praise
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="post_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.postId}
+                </foreach>
+            </trim>
+            <trim prefix="user_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.userId}
+                </foreach>
+            </trim>
+            <trim prefix="create_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.createTime}
+                </foreach>
+            </trim>
+            <trim prefix="modified_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then now()
+                </foreach>
+            </trim>
+            <trim prefix="version = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} and version = #{item.version} then #{item.version} + 1
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from tb_post_praise where id = #{id,jdbcType=INTEGER}
+                                                    and version = #{version,jdbcType=OTHER}
+                        </delete>
+
+    <!--通过实体非空属性删除-->
+    <delete id="deleteByEntity" parameterType="com.luna.post.entity.PostPraise">
+        delete from tb_post_praise
+        <where>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            and version = #{version,jdbcType=OTHER}
+        </where>
+    </delete>
+
+    <!--通过主键列表删除，列表长度不能为0-->
+    <delete id="deleteByIds" parameterType="list">
+        delete from tb_post_praise where id in
+        <foreach item="item" collection="list" separator="," open="(" close=")" index="index">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="countAll" resultType="int">
+        select count(id) from tb_post_praise
+    </select>
+
+    <select id="countByEntity" parameterType="com.luna.post.entity.PostPraise" resultType="int">
+        select count(id) from tb_post_praise
+        <where>
+            <if test="id != null  ">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="postId != null  ">
+                and post_id = #{postId,jdbcType=INTEGER}
+            </if>
+            <if test="userId != null  ">
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="createTime != null  ">
+                and create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifiedTime != null  ">
+                and modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="version != null  ">
+                and version = #{version,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>

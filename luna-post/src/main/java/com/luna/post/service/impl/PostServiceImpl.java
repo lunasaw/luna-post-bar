@@ -31,10 +31,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -106,8 +103,8 @@ public class PostServiceImpl implements PostService {
             commentPraise.setCommentId(0L);
             commentPraiseMapper.insert(commentPraise);
         }
-        return DO2DTOUtil.postDO2PostDTO(postTemp, user.getName(),
-            first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime(), commentPraise.getPraise(),
+        Date date = first.isPresent() ? first.get().getModifiedTime() : postTemp.getModifiedTime();
+        return DO2DTOUtil.postDO2PostDTO(postTemp, user.getName(), date, commentPraise.getPraise(),
             comments.size());
     }
 
@@ -152,7 +149,6 @@ public class PostServiceImpl implements PostService {
         post.setPostAudio(userManager.getPath() + "/" + path);
         return postMapper.insert(post);
     }
-
 
     @Override
     public int insertBatch(List<Post> list) {

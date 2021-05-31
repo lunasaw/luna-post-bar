@@ -122,7 +122,7 @@
             <if test="admin != null  and admin != '' ">
                 admin,
             </if>
-             create_time,
+            create_time,
             modified_time,
             version,
         </trim>
@@ -142,7 +142,7 @@
             <if test="admin != null  and admin != '' ">
                 #{admin,jdbcType=VARCHAR},
             </if>
-           now(),
+            now(),
             now(),
             0,
         </trim>
