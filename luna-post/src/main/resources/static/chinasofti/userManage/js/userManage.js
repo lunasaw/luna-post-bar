@@ -16,6 +16,9 @@ $(document).ready(function () {
     }
 
 });
+$("#checkAll").click(function () {
+    $("input[id^='box_']").prop('checked', this.checked);
+});
 
 function getUserList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
     let userInfo = {
@@ -76,7 +79,7 @@ function getUserList(postTitle, pageStart, pageSize, SynOrAsyn, url) {
                 for (let i in list) {
                     content = content + '<tr bgcolor="#FFFFFF">' +
                         '<td align="center" width="20"> ' +
-                        '<input name="DELETE_CHECK_NAME" type="checkbox" value="' + list[i].id + '"> </td><td valign="center" align="center" width="30">' +
+                        '<input name="DELETE_CHECK_NAME" type="checkbox" id="box_' + list[i].id + '" value="' + list[i].id + '"> </td><td valign="center" align="center" width="30">' +
                         ' <a href="" onclick="EDIT_USER(\'' + list[i].id + '\',\'' + list[i].name + '\',\'' + (list[i].sex === '男' ? 1 : 0) + '\',\'' + list[i].age + ' \',\'' + list[i].email + '\',\'' + (list[i].admin == "管理员" ? 0 : 1) + '\'); return false;">' +
                         '' + list[i].name + '</a></td>' +
                         '<td valign="center" align="center" width="110">' + list[i].email + '</td>' +
@@ -324,3 +327,4 @@ function EDIT_USER(userUUID, userName, regsex, regAge, regEmial, admin) {
     $("#admin").val(admin);
     $("#oldUserName").val(userName);
 }
+

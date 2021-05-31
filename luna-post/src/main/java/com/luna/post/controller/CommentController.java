@@ -114,10 +114,10 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete")
-    public ResultDTO<Integer> deleteBatch(@RequestBody List<Long> ids) {
+    public ResultDTO<Integer> deleteBatch(HttpServletRequest httpServletRequest, @RequestBody List<Long> ids) {
         int result = 0;
         if (ids != null && ids.size() > 0) {
-            result = commentService.deleteByIds(ids);
+            result = commentService.deleteByIds(CookieUtils.getOneSessionKey(httpServletRequest), ids);
         }
         return new ResultDTO<>(true, ResultCode.SUCCESS, ResultCode.MSG_SUCCESS, result);
     }

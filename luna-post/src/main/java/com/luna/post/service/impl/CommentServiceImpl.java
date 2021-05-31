@@ -1,5 +1,6 @@
 package com.luna.post.service.impl;
 
+import com.google.common.collect.Lists;
 import com.luna.baidu.api.BaiduVoiceApi;
 import com.luna.baidu.config.BaiduProperties;
 import com.luna.baidu.req.VoiceSynthesisReq;
@@ -25,6 +26,7 @@ import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -257,9 +259,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public int deleteByIds(List<Long> list) {
+    public int deleteByIds(String sessionKey, List<Long> list) {
+        if (sessionKey == null) {
+            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
+        }
+
+        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+
         for (Long i : list) {
             Comment comment = commentMapper.getById(i);
+            Post post = postMapper.getById(comment.getPostId());
+            if (!post.getUserId().equals(user.getId())) {
+                throw new BaseException(ResultCode.PARAMETER_INVALID, "普通用户不能删除他人评论");
+            }
             CommentPraise commentPraise = new CommentPraise();
             commentPraise.setCommentId(comment.getId());
             commentPraiseMapper.deleteByEntity(commentPraise);
