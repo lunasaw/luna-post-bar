@@ -13,6 +13,23 @@ import java.util.List;
 public interface AudioService {
 
     /**
+     * 文字转语音
+     * 
+     * @param audio 语音配置
+     * @param text 文字
+     * @return
+     */
+    public String changeVoice(Audio audio, String text);
+
+    /**
+     * 用户编号查询声音配置
+     * 
+     * @param userId
+     * @return
+     */
+    Audio getAudio(Long userId);
+
+    /**
      * 通过主键查询数据
      *
      * @param id 主键

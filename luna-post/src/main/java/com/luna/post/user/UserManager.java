@@ -12,6 +12,7 @@ import com.luna.post.entity.User;
 import com.luna.post.entity.UserException;
 import com.luna.post.mapper.RegisterMapper;
 import com.luna.post.mapper.UserMapper;
+import com.luna.post.tools.UserTools;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
@@ -39,7 +40,7 @@ public class UserManager {
     private RegisterMapper registerMapper;
 
     @Autowired
-    private RedisHashUtil  redisHashUtil;
+    private UserTools      userTools;
     /**
      * Nginx 文件服务器
      */
@@ -55,11 +56,7 @@ public class UserManager {
     }
 
     public boolean uploadImg(String sessionKey, MultipartFile file) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
         try {
             // 上传并返回新文件名称
             String fileName = FileUploadUtils.upload(file);
@@ -107,11 +104,7 @@ public class UserManager {
     }
 
     public int updateOwner(String sessionKey, ShowUserDTO showUserDTO) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
 
         User byId = userMapper.getById(user.getId());
         Register byEntity = registerMapper.getByEntity(new Register(user.getId()));
@@ -125,11 +118,8 @@ public class UserManager {
     }
 
     public ShowUserDTO sysUserInfo(String sessionKey) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
+        User user = userTools.getUser(sessionKey);
 
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
         Register byEntity = registerMapper.getByEntity(new Register(user.getId()));
         return DO2DTOUtil.user2ShowUserDTO(user, byEntity);
     }

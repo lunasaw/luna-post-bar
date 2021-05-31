@@ -1,7 +1,15 @@
 package com.luna.post.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.luna.baidu.api.BaiduVoiceApi;
+import com.luna.baidu.config.BaiduProperties;
+import com.luna.baidu.req.VoiceSynthesisReq;
+import com.luna.common.date.DateUtil;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
+import com.luna.common.file.FileTools;
+import com.luna.common.os.SystemInfoUtil;
+import com.luna.common.text.RandomStrUtil;
 import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.AudioDTO;
 import com.luna.post.entity.User;
@@ -11,6 +19,8 @@ import com.luna.post.mapper.UserMapper;
 import com.luna.post.service.AudioService;
 import com.luna.post.entity.Audio;
 
+import com.luna.post.utils.DO2DTOUtil;
+import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +28,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,13 +39,43 @@ import java.util.List;
 public class AudioServiceImpl implements AudioService {
 
     @Resource
-    private AudioMapper   audioMapper;
+    private AudioMapper     audioMapper;
 
     @Resource
-    private UserMapper    userMapper;
+    private RedisHashUtil   redisHashUtil;
 
-    @Resource
-    private RedisHashUtil redisHashUtil;
+    @Autowired
+    private BaiduProperties baiduProperties;
+
+    @Override
+    public String changeVoice(Audio audio, String text) {
+        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
+            text, baiduProperties.getBaiduKey(), audio);
+        String path = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
+            + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
+        try {
+            FileTools.write(BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq), path);
+        } catch (IOException e) {
+            throw new BaseException(ResultCode.ERROR_SYSTEM_EXCEPTION, "音频解码错误");
+        }
+        return path;
+    }
+
+    @Override
+    public Audio getAudio(Long userId) {
+        Audio byEntity = audioMapper.getByEntity(new Audio(userId));
+
+        if (byEntity == null) {
+            byEntity = new Audio();
+            byEntity.setUserId(userId);
+            byEntity.setAudioSpd(5);
+            byEntity.setAudioPit(5);
+            byEntity.setAudioVol(5);
+            byEntity.setAudioVoiPer(0);
+            audioMapper.insert(byEntity);
+        }
+        return byEntity;
+    }
 
     @Override
     public Audio getById(Long id) {

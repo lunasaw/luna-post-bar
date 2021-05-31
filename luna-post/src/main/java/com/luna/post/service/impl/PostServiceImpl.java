@@ -7,6 +7,7 @@ import com.luna.baidu.config.BaiduProperties;
 import com.luna.baidu.req.VoiceSynthesisReq;
 import com.luna.common.date.DateUtil;
 import com.luna.common.dto.constant.ResultCode;
+import com.luna.common.exception.BaseException;
 import com.luna.common.file.FileTools;
 import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.text.RandomStrUtil;
@@ -16,11 +17,14 @@ import com.luna.post.dto.PostDeatilDTO;
 import com.luna.post.dto.ShowUserDTO;
 import com.luna.post.entity.*;
 import com.luna.post.mapper.*;
+import com.luna.post.service.AudioService;
 import com.luna.post.service.PostService;
+import com.luna.post.tools.UserTools;
 import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -61,10 +65,13 @@ public class PostServiceImpl implements PostService {
     private CommentPraiseMapper commentPraiseMapper;
 
     @Resource
-    private RedisHashUtil       redisHashUtil;
+    private UserTools           userTools;
 
     @Resource
     private BaiduProperties     baiduProperties;
+
+    @Autowired
+    private AudioService        audioService;
 
     @Override
     public PostDTO getById(Long id) {
@@ -110,10 +117,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageInfo<PostDTO> listPageByEntity(String sessionKey, int page, int pageSize, Post post) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
 
         if (Objects.equals(user.getAdmin(), "1")) {
             PageHelper.startPage(page, pageSize);
@@ -139,42 +143,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public int insert(String sessionKey, Post post) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
         post.setUserId(user.getId());
-
-        // TODO 这里需要讲内容转为语音
-        Audio byEntity = audioMapper.getByEntity(new Audio(user.getId()));
-
-        if (byEntity == null) {
-            byEntity = new Audio();
-            byEntity.setUserId(user.getId());
-            byEntity.setAudioSpd(5);
-            byEntity.setAudioPit(5);
-            byEntity.setAudioVol(5);
-            byEntity.setAudioVoiPer(0);
-            audioMapper.insert(byEntity);
-        }
-
-        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
-            post.getPostText(), baiduProperties.getBaiduKey(), byEntity);
-
-        if (voiceSynthesisReq != null) {
-            try {
-                byte[] bytes = BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq);
-                String fileName = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
-                    + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
-                FileTools.createDirectory(fileName);
-                FileTools.write(bytes, fileName);
-                post.setPostAudio(userManager.getPath() + "/" + fileName);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        post.setPostPageViews(0L);
+        Audio audio = audioService.getAudio(user.getId());
+        String path = audioService.changeVoice(audio, post.getPostText());
+        post.setPostAudio(userManager.getPath() + "/" + path);
         return postMapper.insert(post);
     }
+
 
     @Override
     public int insertBatch(List<Post> list) {
@@ -226,10 +203,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PageInfo<PostDTO> myListPageByEntity(String sessionKey, int page, int size, Post post) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
+
         PageHelper.startPage(page, size);
         post.setUserId(user.getId());
         return getPostDTOPageInfo(post);

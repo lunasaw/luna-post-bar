@@ -14,8 +14,10 @@ import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.CommentDTO;
 import com.luna.post.entity.*;
 import com.luna.post.mapper.*;
+import com.luna.post.service.AudioService;
 import com.luna.post.service.CommentService;
 
+import com.luna.post.tools.UserTools;
 import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
@@ -52,19 +54,13 @@ public class CommentServiceImpl implements CommentService {
     private UserMapper          userMapper;
 
     @Resource
-    private UserManager         userManager;
-
-    @Resource
     private CommentPraiseMapper commentPraiseMapper;
 
     @Resource
-    private AudioMapper         audioMapper;
+    private AudioService        audioService;
 
     @Resource
-    private RedisHashUtil       redisHashUtil;
-
-    @Resource
-    private BaiduProperties     baiduProperties;
+    private UserTools           userTools;
 
     @Override
     public Comment getById(Long id) {
@@ -101,11 +97,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageInfo<CommentDTO> myListPageByEntity(String sessionKey, int page, int size, Comment comment) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
 
         comment.setUserId(String.valueOf(user.getId()));
         PageHelper.startPage(page, size);
@@ -163,62 +155,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int insert(String sessionKey, Comment comment) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
+        User user = userTools.getUser(sessionKey);
 
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
         comment.setUserId(String.valueOf(user.getId()));
-        // 把文字转为语音
-
-        // TODO 这里需要讲内容转为语音
-        changeVoice(user, comment);
+        Audio audio = audioService.getAudio(user.getId());
+        String path = audioService.changeVoice(audio, comment.getContent());
+        comment.setAudio(path);
         commentMapper.insert(comment);
         return commentPraiseMapper.insert(new CommentPraise(0, comment.getPostId(), user.getId(), comment.getId()));
-    }
-
-    public Comment changeVoice(User user, Comment comment) {
-        // TODO 这里需要讲内容转为语音
-        Audio byEntity = getAudio(user);
-        VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
-            comment.getContent(), baiduProperties.getBaiduKey(), byEntity);
-        String fileName = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
-            + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
-        saveVoice(voiceSynthesisReq, fileName);
-        comment.setAudio(userManager.getPath() + "/" + fileName);
-        return comment;
-    }
-
-    public static String saveVoice(VoiceSynthesisReq voiceSynthesisReq, String path) {
-        if (voiceSynthesisReq != null) {
-            try {
-                byte[] bytes = BaiduVoiceApi.voiceSynthesis(voiceSynthesisReq);
-                FileTools.createDirectory(path);
-                FileTools.write(bytes, path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return path;
-    }
-
-    private Audio getAudio(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        Audio byEntity = audioMapper.getByEntity(new Audio(user.getId()));
-
-        if (byEntity == null) {
-            byEntity = new Audio();
-            byEntity.setUserId(user.getId());
-            byEntity.setAudioSpd(5);
-            byEntity.setAudioPit(5);
-            byEntity.setAudioVol(5);
-            byEntity.setAudioVoiPer(0);
-            audioMapper.insert(byEntity);
-        }
-        return byEntity;
     }
 
     @Override
@@ -228,18 +172,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int update(String sessionKey, Comment comment) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
         Comment commentTemp = commentMapper.getById(comment.getId());
         if (commentTemp == null) {
             throw new BaseException(ResultCode.PARAMETER_INVALID, "评论不存在");
         }
 
         commentTemp.setContent(comment.getContent());
-        commentTemp = changeVoice(user, commentTemp);
+        Audio audio = audioService.getAudio(user.getId());
+        String path = audioService.changeVoice(audio, comment.getContent());
+        commentTemp.setAudio(path);
         return commentMapper.update(commentTemp);
     }
 
@@ -260,11 +202,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int deleteByIds(String sessionKey, List<Long> list) {
-        if (sessionKey == null) {
-            throw new UserException(ResultCode.PARAMETER_INVALID, "用户不存在");
-        }
-
-        User user = (User)redisHashUtil.get(LoginInterceptor.sessionKey + ":" + sessionKey, sessionKey);
+        User user = userTools.getUser(sessionKey);
 
         for (Long i : list) {
             Comment comment = commentMapper.getById(i);
