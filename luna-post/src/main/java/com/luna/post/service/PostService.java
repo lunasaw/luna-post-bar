@@ -127,10 +127,12 @@ public interface PostService {
     /**
      * 主键列表删除
      *
+     *
+     * @param oneSessionKey
      * @param list 主键列表
      * @return 影响行数
      */
-    int deleteByIds(List<Long> list);
+    int deleteByIds(String oneSessionKey, List<Long> list);
 
     /**
      * 数据条目

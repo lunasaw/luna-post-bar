@@ -4,6 +4,8 @@ import com.luna.post.mapper.PostPraiseMapper;
 import com.luna.post.service.PostPraiseService;
 import com.luna.post.entity.PostPraise;
 import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

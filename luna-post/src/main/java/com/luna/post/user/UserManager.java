@@ -47,6 +47,17 @@ public class UserManager {
     @Value("${luna.nginx.path}")
     private String         path = "http://127.0.0.1:8081";
 
+    @Value("${luna.file.path}")
+    private String         filePath;
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     public String getPath() {
         return path;
     }
@@ -59,7 +70,7 @@ public class UserManager {
         User user = userTools.getUser(sessionKey);
         try {
             // 上传并返回新文件名称
-            String fileName = FileUploadUtils.upload(file);
+            String fileName = FileUploadUtils.upload(filePath, file);
             String url = path + fileName;
             Register byEntity = registerMapper.getByEntity(new Register(user.getId()));
             byEntity.setPhoto(url);

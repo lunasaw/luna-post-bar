@@ -1,18 +1,9 @@
 package com.luna.post.service.impl;
 
-import java.io.IOException;
-
-import com.luna.baidu.api.BaiduVoiceApi;
 import com.luna.baidu.config.BaiduProperties;
-import com.luna.baidu.req.VoiceSynthesisReq;
-import com.luna.common.date.DateUtil;
 import com.luna.common.dto.constant.ResultCode;
 import com.luna.common.exception.BaseException;
-import com.luna.common.file.FileTools;
-import com.luna.common.os.SystemInfoUtil;
 import com.luna.common.text.Html2Text;
-import com.luna.common.text.RandomStrUtil;
-import com.luna.post.config.LoginInterceptor;
 import com.luna.post.dto.PostDTO;
 import com.luna.post.dto.PostDeatilDTO;
 import com.luna.post.dto.ShowUserDTO;
@@ -23,8 +14,6 @@ import com.luna.post.service.PostService;
 import com.luna.post.tools.UserTools;
 import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
-import com.luna.post.utils.FileUploadUtils;
-import com.luna.redis.util.RedisHashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
@@ -176,9 +165,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public int deleteByIds(List<Long> list) {
+    public int deleteByIds(String sessionKey, List<Long> list) {
+        User user = userTools.getUser(sessionKey);
+
         for (Long i : list) {
             Post post = postMapper.getById(i);
+            // TODO 正常这里应该查询用户权限判断
+            if (!"1".equals(user.getAdmin()) && !post.getUserId().equals(user.getId())) {
+                throw new BaseException(ResultCode.PARAMETER_INVALID, "文章不是用户所有");
+            }
             CommentPraise commentPraise = new CommentPraise();
             // post 的赞，对应的评论应为0
             commentPraise.setPostId(post.getId());

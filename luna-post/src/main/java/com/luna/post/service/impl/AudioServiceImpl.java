@@ -19,6 +19,7 @@ import com.luna.post.mapper.UserMapper;
 import com.luna.post.service.AudioService;
 import com.luna.post.entity.Audio;
 
+import com.luna.post.user.UserManager;
 import com.luna.post.utils.DO2DTOUtil;
 import com.luna.post.utils.FileUploadUtils;
 import com.luna.redis.util.RedisHashUtil;
@@ -47,11 +48,14 @@ public class AudioServiceImpl implements AudioService {
     @Autowired
     private BaiduProperties baiduProperties;
 
+    @Autowired
+    private UserManager     userManager;
+
     @Override
     public String changeVoice(Audio audio, String text) {
         VoiceSynthesisReq voiceSynthesisReq = DO2DTOUtil.audio2VoiceSynthesisReq(SystemInfoUtil.getRandomMac(),
             text, baiduProperties.getBaiduKey(), audio);
-        String path = FileUploadUtils.defaultBaseDir + "/" + DateUtil.datePath() + "/"
+        String path = userManager.getFilePath() + "/" + DateUtil.datePath() + "/"
             + RandomStrUtil.generateNonceStrWithUUID() + ".mp3";
         try {
             FileTools.createDirectory(path);
