@@ -45,10 +45,10 @@ public class UserManager {
      * Nginx 文件服务器
      */
     @Value("${luna.nginx.path}")
-    private String         path = "http://127.0.0.1:8081";
+    private String         path     = "http://127.0.0.1:8081";
 
     @Value("${luna.file.path}")
-    private String         filePath;
+    private String         filePath = "/Users/luna/Document/project/post";
 
     public String getFilePath() {
         return filePath;
